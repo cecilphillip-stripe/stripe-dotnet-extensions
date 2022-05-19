@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6655CA4E-B306-4156-8035-B7E11D046F40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.AspNetCore", "src\Stripe.AspNetCore\Stripe.AspNetCore.csproj", "{E0282C2F-786D-474F-9EBE-5DB16D1EA5D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.AspNetCore.Tests", "src\Stripe.AspNetCore.Tests\Stripe.AspNetCore.Tests.csproj", "{040408B7-2EA6-4D61-A224-7BE01F81069F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E0282C2F-786D-474F-9EBE-5DB16D1EA5D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0282C2F-786D-474F-9EBE-5DB16D1EA5D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0282C2F-786D-474F-9EBE-5DB16D1EA5D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0282C2F-786D-474F-9EBE-5DB16D1EA5D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{040408B7-2EA6-4D61-A224-7BE01F81069F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{040408B7-2EA6-4D61-A224-7BE01F81069F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{040408B7-2EA6-4D61-A224-7BE01F81069F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{040408B7-2EA6-4D61-A224-7BE01F81069F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E0282C2F-786D-474F-9EBE-5DB16D1EA5D0} = {6655CA4E-B306-4156-8035-B7E11D046F40}
+		{040408B7-2EA6-4D61-A224-7BE01F81069F} = {6655CA4E-B306-4156-8035-B7E11D046F40}
+	EndGlobalSection
+EndGlobal
