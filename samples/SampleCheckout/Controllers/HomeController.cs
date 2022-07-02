@@ -8,11 +8,13 @@ namespace SampleCheckout.Controllers;
 public class HomeController : Controller
 {
     private readonly IStripeClient _stripeClient;
+    private readonly ProductService _productService;
     private readonly ILogger<HomeController> _logger;
 
-    public HomeController(IStripeClient stripeClient, ILogger<HomeController> logger)
+    public HomeController(IStripeClient stripeClient, ProductService productService, ILogger<HomeController> logger)
     {
         _stripeClient = stripeClient;
+        _productService = productService;
         _logger = logger;
     }
 

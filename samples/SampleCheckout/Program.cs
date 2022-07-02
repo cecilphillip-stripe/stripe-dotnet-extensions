@@ -1,5 +1,3 @@
-
-
 using Stripe.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
