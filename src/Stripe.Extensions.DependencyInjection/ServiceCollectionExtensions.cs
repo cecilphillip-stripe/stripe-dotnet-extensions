@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Extensions.DependencyInjection;
 
@@ -24,13 +26,16 @@ public static class ServiceCollectionExtensions
             {
                 var stripeConfigSection = provider.GetRequiredService<IConfiguration>()
                     .GetSection(StripeOptions.ConfigurationSectionName);
-                StripeConfiguration.ApiKey = stripeConfigSection["SecretKey"];
 
                 configureOptions(provider, options);
+                
+                StripeConfiguration.ApiKey = options.SecretKey;
+                StripeConfiguration.EnableTelemetry = options.EnableTelemetry;
+                StripeConfiguration.MaxNetworkRetries = options.MaxNetworkRetries;
             });
 
         var asm = Assembly.GetExecutingAssembly().GetName();
-        appInfo = appInfo ?? new AppInfo
+        appInfo ??= new AppInfo
         {
             Name = asm.Name,
             Version = asm.Version?.ToString()
@@ -40,15 +45,46 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient("Stripe");
         services.AddTransient<IStripeClient, StripeClient>(s =>
         {
+            var stripeOptions = s.GetRequiredService<IOptions<StripeOptions>>();
             var clientFactory = s.GetRequiredService<IHttpClientFactory>();
-            var httpClient = new SystemNetHttpClient(
+            var systemHttpClient = new SystemNetHttpClient(
                 httpClient: clientFactory.CreateClient("Stripe"),
-                maxNetworkRetries: StripeConfiguration.MaxNetworkRetries,
+                maxNetworkRetries: stripeOptions.Value.MaxNetworkRetries,
                 appInfo: appInfo,
-                enableTelemetry: StripeConfiguration.EnableTelemetry);
+                enableTelemetry: stripeOptions.Value.EnableTelemetry);
 
-            return new StripeClient(apiKey: StripeConfiguration.ApiKey, httpClient: httpClient);
+            return new StripeClient(apiKey: stripeOptions.Value.SecretKey, httpClient: systemHttpClient);
         });
+
+        RegisterStripeServices(services);
         return services;
+    }
+
+    private static void RegisterStripeServices(IServiceCollection collection)
+    {
+        var stripeServiceTypes = typeof(StripeClient).Assembly.DefinedTypes
+            .Select(info => info.AsType())
+            .Where(t => t.IsClass && !t.IsAbstract && t.IsPublic &&
+                        t.Name.EndsWith("Service", StringComparison.Ordinal));
+
+        foreach (var type in stripeServiceTypes)
+            TryAddType(collection, type);
+    }
+
+    private static void TryAddType(IServiceCollection collection, Type type)
+    {
+        var constructorInfo = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
+        foreach (var constructor in constructorInfo)
+        {
+            var parameters = constructor.GetParameters();
+            foreach (var parameter in parameters)
+            {
+                if (parameter.ParameterType == typeof(IStripeClient))
+                {
+                    collection.TryAdd(ServiceDescriptor.Transient(type, type));
+                    return;
+                }
+            }
+        }
     }
 }
