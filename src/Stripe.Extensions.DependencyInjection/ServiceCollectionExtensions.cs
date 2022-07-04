@@ -24,8 +24,8 @@ public static class ServiceCollectionExtensions
         services.AddOptions<StripeOptions>()
             .Configure<IServiceProvider>((options, provider) =>
             {
-                var stripeConfigSection = provider.GetRequiredService<IConfiguration>()
-                    .GetSection(StripeOptions.ConfigurationSectionName);
+                // var stripeConfigSection = provider.GetRequiredService<IConfiguration>()
+                //    .GetSection(StripeOptions.ConfigurationSectionName);
 
                 configureOptions(provider, options);
                 
