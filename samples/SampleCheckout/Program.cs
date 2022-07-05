@@ -1,29 +1,32 @@
+using SampleCheckout.Processors;
+using Stripe.Extensions.AspNetCore;
 using Stripe.Extensions.DependencyInjection;
+using Stripe.Extensions.Webhooks;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
 builder.Services.AddStripe(builder.Configuration.GetSection(StripeOptions.ConfigurationSectionName));
+//builder.Services.AddSingleton<IWebhookEventProcessor, CatchAllEventProcessor>();
+builder.Services.AddSingleton<IWebhookEventProcessor, ObservableEventProcessor>(provider =>
+{
+    var processor = new ObservableEventProcessor();
+    var logger = provider.GetRequiredService<ILoggerFactory>().CreateLogger("SampleCheckout");
+    processor.WebhookEventsObservable.Subscribe(hookCtx =>
+    {
+        logger.LogInformation("Received WebhookEvent type {WebhookEventType}", hookCtx.WebhookEvent.Type);
+    });
+    
+    return processor;
+});
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
 
 app.UseStaticFiles();
 
 app.UseRouting();
-
-app.UseAuthorization();
-
+app.MapStripeWebhooks();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

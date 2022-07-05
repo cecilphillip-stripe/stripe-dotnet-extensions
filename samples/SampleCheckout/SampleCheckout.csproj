@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Stripe.Extensions.DependencyInjection\Stripe.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\src\Stripe.Extensions.AspNetCore\Stripe.Extensions.AspNetCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 
 </Project>
