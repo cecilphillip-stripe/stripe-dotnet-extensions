@@ -1,7 +1,6 @@
 <Project>
     <PropertyGroup>
         <LangVersion>latest</LangVersion>
-        <TargetFrameworks>net5.0;net6.0;netcoreapp3.1</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

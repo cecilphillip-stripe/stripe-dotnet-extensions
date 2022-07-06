@@ -11,6 +11,9 @@ public static class ServiceCollectionExtensions
 {
     private const string HttpClientName = "Stripe";
 
+    public static IServiceCollection AddStripe(this IServiceCollection services)
+        => services.AddStripe(options => { });
+
     public static IServiceCollection AddStripe(this IServiceCollection services, string apiKey)
         => services.AddStripe(options => options.SecretKey = apiKey);
 
