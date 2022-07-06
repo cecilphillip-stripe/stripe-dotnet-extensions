@@ -9,8 +9,16 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
+    private const string HttpClientName = "Stripe";
+
+    public static IServiceCollection AddStripe(this IServiceCollection services)
+        => services.AddStripe(options => { });
+
+    public static IServiceCollection AddStripe(this IServiceCollection services, string apiKey)
+        => services.AddStripe(options => options.SecretKey = apiKey);
+
     public static IServiceCollection AddStripe(this IServiceCollection services, Action<StripeOptions> configureOptions)
-        => services.AddStripe((_, options) => configureOptions(options));
+        => services.AddStripe((options, _) => configureOptions(options));
 
     public static IServiceCollection AddStripe(this IServiceCollection services, IConfiguration config)
     {
@@ -19,41 +27,37 @@ public static class ServiceCollectionExtensions
     }
 
     public static IServiceCollection AddStripe(this IServiceCollection services,
-        Action<IServiceProvider, StripeOptions> configureOptions, AppInfo? appInfo = default)
+        Action<StripeOptions, IServiceProvider> configureOptions, AppInfo? appInfo = default)
     {
         services.AddOptions<StripeOptions>()
+            .Configure(options =>
+            {
+                var asm = Assembly.GetExecutingAssembly().GetName();
+                options.AppInfo ??= new AppInfo
+                {
+                    Name = asm.Name,
+                    Version = asm.Version?.ToString()
+                };
+            })
             .Configure<IServiceProvider>((options, provider) =>
             {
-                var stripeConfigSection = provider.GetRequiredService<IConfiguration>()
-                    .GetSection(StripeOptions.ConfigurationSectionName);
+                var configuration = provider.GetService<IConfiguration>();
+                configuration?.GetSection(StripeOptions.ConfigurationSectionName).Bind(options);
+            })
+            .Configure(configureOptions);
 
-                configureOptions(provider, options);
-                
-                StripeConfiguration.ApiKey = options.SecretKey;
-                StripeConfiguration.EnableTelemetry = options.EnableTelemetry;
-                StripeConfiguration.MaxNetworkRetries = options.MaxNetworkRetries;
-            });
-
-        var asm = Assembly.GetExecutingAssembly().GetName();
-        appInfo ??= new AppInfo
+        services.AddHttpClient(HttpClientName);
+        services.AddSingleton<IStripeClient, StripeClient>(s =>
         {
-            Name = asm.Name,
-            Version = asm.Version?.ToString()
-        };
-        StripeConfiguration.AppInfo = appInfo;
-
-        services.AddHttpClient("Stripe");
-        services.AddTransient<IStripeClient, StripeClient>(s =>
-        {
-            var stripeOptions = s.GetRequiredService<IOptions<StripeOptions>>();
+            var stripeOptions = s.GetRequiredService<IOptions<StripeOptions>>().Value;
             var clientFactory = s.GetRequiredService<IHttpClientFactory>();
             var systemHttpClient = new SystemNetHttpClient(
-                httpClient: clientFactory.CreateClient("Stripe"),
-                maxNetworkRetries: stripeOptions.Value.MaxNetworkRetries,
+                httpClient: clientFactory.CreateClient(HttpClientName),
+                maxNetworkRetries: stripeOptions.MaxNetworkRetries,
                 appInfo: appInfo,
-                enableTelemetry: stripeOptions.Value.EnableTelemetry);
+                enableTelemetry: stripeOptions.EnableTelemetry);
 
-            return new StripeClient(apiKey: stripeOptions.Value.SecretKey, httpClient: systemHttpClient);
+            return new StripeClient(apiKey: stripeOptions.SecretKey, httpClient: systemHttpClient);
         });
 
         RegisterStripeServices(services);
@@ -81,7 +85,7 @@ public static class ServiceCollectionExtensions
             {
                 if (parameter.ParameterType == typeof(IStripeClient))
                 {
-                    collection.TryAdd(ServiceDescriptor.Transient(type, type));
+                    collection.TryAdd(ServiceDescriptor.Singleton(type, type));
                     return;
                 }
             }
