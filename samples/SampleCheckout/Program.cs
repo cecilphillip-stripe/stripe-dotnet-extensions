@@ -7,7 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddStripe(builder.Configuration.GetSection(StripeOptions.ConfigurationSectionName));
+
+builder.Services.AddStripe();
 //builder.Services.AddSingleton<IWebhookEventProcessor, CatchAllEventProcessor>();
 builder.Services.AddSingleton<IWebhookEventProcessor, ObservableEventProcessor>(provider =>
 {

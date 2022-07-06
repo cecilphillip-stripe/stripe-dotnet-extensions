@@ -7,5 +7,6 @@ public class StripeOptions
     public string SecretKey { get; set; } = string.Empty;
     public string WebhookSecret { get; set; } = string.Empty;
     public bool EnableTelemetry { get; set; } = true;
+    public AppInfo? AppInfo { get; set; }
     public int MaxNetworkRetries { get; set; } = SystemNetHttpClient.DefaultMaxNumberRetries;
 }
