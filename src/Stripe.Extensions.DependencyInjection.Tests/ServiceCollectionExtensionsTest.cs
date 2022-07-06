@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Stripe.Radar;
 using Stripe.Reporting;
@@ -95,7 +96,37 @@ public class ServiceCollectionExtensionsTest
         var collection = new ServiceCollection();
         collection.AddStripe("someAPIkey");
 
-        var provider =  collection.BuildServiceProvider();
+        var provider = collection.BuildServiceProvider();
         Assert.NotNull(provider.GetRequiredService(serviceType));
+    }
+
+    [Fact]
+    public void ReadsKeyInformationFromDefaultConfigSection()
+    {
+        var collection = new ServiceCollection();
+        collection.AddSingleton<IConfiguration>(
+            new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>()
+                {
+                    { "Stripe:SecretKey", "MyKey" }
+                }).Build());
+        collection.AddStripe();
+        
+        var provider = collection.BuildServiceProvider();
+        var priceService = provider.GetRequiredService<PriceService>();
+        
+        Assert.Equal("MyKey", priceService.Client.ApiKey);
+    }
+    
+    [Fact]
+    public void UsesApiKeyProvidedDuringRegistration()
+    {
+        var collection = new ServiceCollection();
+        collection.AddStripe("MyKey");
+        
+        var provider = collection.BuildServiceProvider();
+        var priceService = provider.GetRequiredService<PriceService>();
+        
+        Assert.Equal("MyKey", priceService.Client.ApiKey);
     }
 }
