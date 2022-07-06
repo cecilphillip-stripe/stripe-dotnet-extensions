@@ -16,4 +16,8 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Stripe.Extensions.DependencyInjection\Stripe.Extensions.DependencyInjection.csproj" />
+  </ItemGroup>
 </Project>
