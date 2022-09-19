@@ -46,7 +46,6 @@ public class ServiceCollectionExtensionsTest
     [InlineData(typeof(TransactionService))]
     [InlineData(typeof(MandateService))]
     [InlineData(typeof(OAuthTokenService))]
-    [InlineData(typeof(OrderService))]
     [InlineData(typeof(PaymentIntentService))]
     [InlineData(typeof(PaymentLinkService))]
     [InlineData(typeof(PaymentMethodService))]
