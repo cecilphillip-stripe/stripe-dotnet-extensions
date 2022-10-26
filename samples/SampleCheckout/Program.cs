@@ -1,10 +1,10 @@
-using Stripe.Extensions.DependencyInjection;
+using Stripe;
+using Stripe.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
 builder.Services.AddStripe();
 
 var app = builder.Build();
@@ -17,7 +17,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -27,5 +26,21 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+app.MapStripeWebhookHandler<MyHandler>();
 app.Run();
+
+public class MyHandler: StripeWebhookHandler
+{
+    private readonly PaymentIntentService _service;
+
+    public MyHandler(PaymentIntentService service)
+    {
+        _service = service;
+    }
+
+    public override async Task OnPaymentIntentCreatedAsync(Event e)
+    {
+        PaymentIntent paymentIntent = (PaymentIntent)e.Data.Object;
+        await _service.ConfirmAsync(paymentIntent.Id);
+    }
+}
