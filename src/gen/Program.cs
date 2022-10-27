@@ -49,7 +49,6 @@ foreach (var method in methods)
 builder.AppendLine($@"        _ => UnknownEventAsync(e),");
 builder.AppendLine($@"    }};");
 
-
 builder.AppendLine("}");
 
 File.WriteAllText("../Stripe.AspNetCore/StripeWebhookHandler.Generated.cs", builder.ToString());

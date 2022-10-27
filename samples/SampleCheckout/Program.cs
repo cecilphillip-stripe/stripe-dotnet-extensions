@@ -25,21 +25,13 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapStripeWebhookHandler<MyHandler>();
+app.MapStripeWebhookHandler<MyCoolHandler>();
 app.Run();
 
-public class MyHandler: StripeWebhookHandler
+public class MyCoolHandler: StripeWebhookHandler
 {
-    private readonly PaymentIntentService _service;
-
-    public MyHandler(PaymentIntentService service)
+    public override Task OnCustomerDiscountDeletedAsync(Event e)
     {
-        _service = service;
-    }
-
-    public override async Task OnPaymentIntentCreatedAsync(Event e)
-    {
-        PaymentIntent paymentIntent = (PaymentIntent)e.Data.Object;
-        await _service.ConfirmAsync(paymentIntent.Id);
+        return Task.CompletedTask;
     }
 }
