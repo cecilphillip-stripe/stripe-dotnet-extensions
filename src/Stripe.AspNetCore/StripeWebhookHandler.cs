@@ -104,6 +104,6 @@ public abstract partial class StripeWebhookHandler
     
     private static Action<ILogger, string, string, Exception?> UnhandledEvent = LoggerMessage.Define<string, string>(
         LogLevel.Warning,
-        3,
+        4,
         "Event type {event_type} does not have a handler. Override the {method_name} method to handle the event.");
 }
