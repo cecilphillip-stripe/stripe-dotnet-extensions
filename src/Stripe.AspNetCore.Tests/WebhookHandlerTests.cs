@@ -119,6 +119,41 @@ public class WebhookHandlerTests
         Assert.DoesNotContain(testSink.LogEntries, e=> e.LogLevel >= LogLevel.Warning);
     }
 
+    [Fact]
+    public async Task CanDisableAPIVersionCheck()
+    {
+        ITestLoggerSink testSink;
+
+        using (TestServer testServer = new TestServer(
+                   BuildHostBuilder(options => options.ThrowOnWebhookApiVersionMismatch = false)))
+        {
+            testSink = testServer.Host.Services.GetRequiredService<ITestLoggerSink>();
+            using HttpClient httpClient = testServer.CreateClient();
+            await httpClient.PostAsync("/webhook", BuildPayload(apiVersion: "01-02-1234"));
+        }
+
+        Assert.Contains(_invocations, e => e.Type == "customer.created");
+        Assert.DoesNotContain(testSink.LogEntries, e=> e.LogLevel >= LogLevel.Warning);
+    }
+
+    [Fact]
+    public async Task VersionCheckIsOnByDefault()
+    {
+        ITestLoggerSink testSink;
+
+        using (TestServer testServer = new TestServer(BuildHostBuilder()))
+        {
+            testSink = testServer.Host.Services.GetRequiredService<ITestLoggerSink>();
+            using HttpClient httpClient = testServer.CreateClient();
+            await httpClient.PostAsync("/webhook", BuildPayload(apiVersion: "01-02-1234"));
+        }
+
+        Assert.Contains(testSink.LogEntries, e=>
+            e.LogLevel == LogLevel.Warning &&
+            e.Exception?.Message.Contains("API version") == true &&
+            e.Message == "Exception occured while parsing the Stripe WebHook event payload.");
+    }
+
     private class MockHandler: StripeWebhookHandler
     {
         private readonly List<Event> _invocations;
