@@ -59,7 +59,7 @@ public abstract partial class StripeWebhookHandler
         catch (Exception e)
         {
             EventParsingError(Logger, e);
-            response.StatusCode = 500;
+            response.StatusCode = 400;
             return;
         }
 

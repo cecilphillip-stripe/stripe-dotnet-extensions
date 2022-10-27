@@ -1,3 +1,4 @@
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using MELT;
@@ -43,7 +44,8 @@ public class WebhookHandlerTests
         {
             testSink = testServer.Host.Services.GetRequiredService<ITestLoggerSink>();
             using HttpClient httpClient = testServer.CreateClient();
-            await httpClient.PostAsync("/webhook", new StringContent("{}"));
+            var response =  await httpClient.PostAsync("/webhook", new StringContent("{}"));
+            Assert.Equal((HttpStatusCode)400, response.StatusCode);
         }
 
         Assert.Contains(testSink.LogEntries, e=>
@@ -60,7 +62,8 @@ public class WebhookHandlerTests
         {
             testSink = testServer.Host.Services.GetRequiredService<ITestLoggerSink>();
             using HttpClient httpClient = testServer.CreateClient();
-            await httpClient.PostAsync("/webhook", BuildPayload("customer.deleted"));
+            var response = await httpClient.PostAsync("/webhook", BuildPayload("customer.deleted"));
+            Assert.Equal((HttpStatusCode)200, response.StatusCode);
         }
 
         Assert.Contains(testSink.LogEntries, e=>
@@ -77,7 +80,8 @@ public class WebhookHandlerTests
         {
             testSink = testServer.Host.Services.GetRequiredService<ITestLoggerSink>();
             using HttpClient httpClient = testServer.CreateClient();
-            await httpClient.PostAsync("/webhook", BuildPayload("customer.happy"));
+            var response = await httpClient.PostAsync("/webhook", BuildPayload("customer.happy"));
+            Assert.Equal((HttpStatusCode)200, response.StatusCode);
         }
 
         Assert.Contains(testSink.LogEntries, e=>
@@ -94,7 +98,8 @@ public class WebhookHandlerTests
         {
             testSink = testServer.Host.Services.GetRequiredService<ITestLoggerSink>();
             using HttpClient httpClient = testServer.CreateClient();
-            await httpClient.PostAsync("/webhook", BuildPayload("customer.updated"));
+            var response = await httpClient.PostAsync("/webhook", BuildPayload("customer.updated"));
+            Assert.Equal((HttpStatusCode)500, response.StatusCode);
         }
 
         Assert.Contains(testSink.LogEntries, e=>
@@ -112,7 +117,8 @@ public class WebhookHandlerTests
         {
             testSink = testServer.Host.Services.GetRequiredService<ITestLoggerSink>();
             using HttpClient httpClient = testServer.CreateClient();
-            await httpClient.PostAsync("/webhook", BuildPayload());
+            var response = await httpClient.PostAsync("/webhook", BuildPayload());
+            Assert.Equal((HttpStatusCode)200, response.StatusCode);
         }
 
         Assert.Contains(_invocations, e => e.Type == "customer.created");
@@ -129,7 +135,8 @@ public class WebhookHandlerTests
         {
             testSink = testServer.Host.Services.GetRequiredService<ITestLoggerSink>();
             using HttpClient httpClient = testServer.CreateClient();
-            await httpClient.PostAsync("/webhook", BuildPayload(apiVersion: "01-02-1234"));
+            var response = await httpClient.PostAsync("/webhook", BuildPayload(apiVersion: "01-02-1234"));
+            Assert.Equal((HttpStatusCode)200, response.StatusCode);
         }
 
         Assert.Contains(_invocations, e => e.Type == "customer.created");
