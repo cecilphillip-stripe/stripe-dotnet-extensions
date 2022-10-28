@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddStripe();
+builder.Services.AddStripe(o => o.SecretKey = "...");
 
 var app = builder.Build();
 
@@ -30,8 +30,8 @@ app.Run();
 
 public class MyCoolHandler: StripeWebhookHandler
 {
-    public override Task OnCustomerDiscountDeletedAsync(Event e)
+    public override Task OnCustomerCreatedAsync(Event e)
     {
-        return Task.CompletedTask;
+        return base.OnCustomerCreatedAsync(e);
     }
 }
