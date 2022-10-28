@@ -127,3 +127,34 @@ public class MyWebhookHandler: StripeWebhookHandler
     }
 }
 ```
+
+## Unit testing
+
+The `StripeWebhookHandler` also simplifies unit testing of your webhook handling logic.
+For example, this is how you can unit-test the logic of the handler from the previous section using XUnit and Moq:
+
+!!!!!! TODO VALIDATE THIS WORKS VVV
+```C#
+[Fact]
+public async Task UpdatesCustomerOnCreation()
+{
+    var serviceMock = new Mock<CustomerService>();
+    var handler = new MyWebhookHandler(serviceMock.Object);
+    var e = new Event()
+    {
+        Data = new EventData()
+        {
+            Object = new Customer()
+            {
+                Id = "cus_123"
+            }
+        }
+    };
+    await handler.OnCustomerCreatedAsync(e);
+
+    // Verify that the customer was updated with a new description
+    serviceMock.Verify(s => s.UpdateAsync(
+        "cus_123",
+        It.Is<CustomerUpdateOptions>(o => o.Description == "New customer")));
+}
+```
