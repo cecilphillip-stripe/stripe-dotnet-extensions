@@ -54,6 +54,18 @@ public class WebhookHandlerTests
     }
 
     [Fact]
+    public async Task ThrowsUsefulErrorMessageIfWebhookSecretNotSet()
+    {
+        using (TestServer testServer = new TestServer(BuildHostBuilder(o => o.WebhookSecret = null!)))
+        {
+            using HttpClient httpClient = testServer.CreateClient();
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+                async () => await httpClient.PostAsync("/webhook", BuildPayload()));
+            Assert.Contains("WebhookSecret is required to validate events", exception.Message);
+        }
+    }
+
+    [Fact]
     public async Task LogsUnregisteredEvent()
     {
         ITestLoggerSink testSink;
@@ -234,5 +246,4 @@ public class WebhookHandlerTests
             Headers = { {"Stripe-Signature", signature} },
         };
     }
-
 }

@@ -128,4 +128,15 @@ public class ServiceCollectionExtensionsTest
         
         Assert.Equal("MyKey", priceService.Client.ApiKey);
     }
+
+    [Fact]
+    public void ClientResolutionThrowsUsefulErrorWhenKeyNotSet()
+    {
+        var collection = new ServiceCollection();
+        collection.AddStripe();
+
+        var provider = collection.BuildServiceProvider();
+        var exception = Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<PriceService>());
+        Assert.Contains("SecretKey is required to make requests to Stripe API", exception.Message);
+    }
 }

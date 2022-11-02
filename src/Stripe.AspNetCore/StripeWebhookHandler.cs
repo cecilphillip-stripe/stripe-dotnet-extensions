@@ -42,13 +42,20 @@ public abstract partial class StripeWebhookHandler
         HttpContext httpContext = Context.HttpContext;
         HttpResponse response = httpContext.Response;
 
+        StripeOptions options = Context.StripeOptions;
+        if (string.IsNullOrEmpty(options.WebhookSecret))
+        {
+            throw new InvalidOperationException("WebhookSecret is required to validate events. " +
+                                                "You can set it using Stripe:WebhookSecret configuration section or " +
+                                                "by passing the value to .AddStripe(o => o.WebhookSecret = \"whse_123\") call");
+        }
+
         Event stripeEvent;
         try
         {
             using StreamReader stream = new StreamReader(httpContext.Request.Body);
             HttpRequest request = httpContext.Request;
             string body = await stream.ReadToEndAsync();
-            StripeOptions options = Context.StripeOptions;
             stripeEvent = EventUtility.ConstructEvent(
                 body,
                 request.Headers["Stripe-Signature"],
@@ -65,7 +72,7 @@ public abstract partial class StripeWebhookHandler
 
         try
         {
-            await ExecuteInternalAsync(stripeEvent).ConfigureAwait(false);
+            await ExecuteAsync(stripeEvent).ConfigureAwait(false);
         }
         catch (Exception e)
         {

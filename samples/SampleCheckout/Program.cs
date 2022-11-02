@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddStripe(o => o.SecretKey = "...");
+builder.Services.AddStripe();
 
 var app = builder.Build();
 
@@ -25,13 +25,23 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapStripeWebhookHandler<MyCoolHandler>();
+app.MapStripeWebhookHandler<MyWebhookHandler>();
 app.Run();
 
-public class MyCoolHandler: StripeWebhookHandler
+public class MyWebhookHandler: StripeWebhookHandler
 {
-    public override Task OnCustomerCreatedAsync(Event e)
+    private readonly CustomerService _customerService;
+    public MyWebhookHandler(CustomerService customerService)
     {
-        return base.OnCustomerCreatedAsync(e);
+        _customerService = customerService;
+    }
+
+    public override async Task OnCustomerCreatedAsync(Event e)
+    {
+        Customer customer = (Customer)e.Data.Object;
+        await _customerService.UpdateAsync(customer.Id, new CustomerUpdateOptions()
+        {
+            Description = "New customer"
+        });
     }
 }

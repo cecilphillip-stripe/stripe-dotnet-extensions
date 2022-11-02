@@ -652,7 +652,7 @@ public partial class StripeWebhookHandler
     /// Fired when the treasury.received_debit.created event is received.
     public virtual Task OnTreasuryReceivedDebitCreatedAsync(Event e) => UnhandledEventAsync(e);
 
-    private Task ExecuteInternalAsync(Event e) => e.Type switch
+    protected virtual Task ExecuteAsync(Event e) => e.Type switch
     {
         "account.application.authorized" => OnAccountApplicationAuthorizedAsync(e),
         "account.application.deauthorized" => OnAccountApplicationDeauthorizedAsync(e),

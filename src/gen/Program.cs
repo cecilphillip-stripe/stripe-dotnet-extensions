@@ -40,7 +40,7 @@ foreach (var method in methods)
     builder.AppendLine();
 }
 
-builder.AppendLine($@"    private virtual Task ExecuteInternalAsync(Event e) => e.Type switch");
+builder.AppendLine($@"    protected virtual Task ExecuteAsync(Event e) => e.Type switch");
 builder.AppendLine($@"    {{");
 foreach (var method in methods)
 {
