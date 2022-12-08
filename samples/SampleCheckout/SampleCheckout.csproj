@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Stripe.Extensions.DependencyInjection\Stripe.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\src\Stripe.AspNetCore\Stripe.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

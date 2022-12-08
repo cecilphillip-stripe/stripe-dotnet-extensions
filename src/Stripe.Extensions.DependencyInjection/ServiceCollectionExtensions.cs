@@ -27,7 +27,7 @@ public static class ServiceCollectionExtensions
     }
 
     public static IServiceCollection AddStripe(this IServiceCollection services,
-        Action<StripeOptions, IServiceProvider> configureOptions, AppInfo? appInfo = default)
+        Action<StripeOptions, IServiceProvider> configureOptions)
     {
         services.AddOptions<StripeOptions>()
             .Configure(options =>
@@ -50,11 +50,17 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IStripeClient, StripeClient>(s =>
         {
             var stripeOptions = s.GetRequiredService<IOptions<StripeOptions>>().Value;
+            if (string.IsNullOrEmpty(stripeOptions.SecretKey))
+            {
+                throw new InvalidOperationException("SecretKey is required to make requests to Stripe API. " +
+                                                    "You can set it using Stripe:SecretKey configuration section or " +
+                                                    "by passing the value to .AddStripe(\"key\") call");
+            }
             var clientFactory = s.GetRequiredService<IHttpClientFactory>();
             var systemHttpClient = new SystemNetHttpClient(
                 httpClient: clientFactory.CreateClient(HttpClientName),
                 maxNetworkRetries: stripeOptions.MaxNetworkRetries,
-                appInfo: appInfo,
+                appInfo: stripeOptions.AppInfo,
                 enableTelemetry: stripeOptions.EnableTelemetry);
 
             return new StripeClient(apiKey: stripeOptions.SecretKey, httpClient: systemHttpClient);

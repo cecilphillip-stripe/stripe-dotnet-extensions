@@ -46,7 +46,6 @@ public class ServiceCollectionExtensionsTest
     [InlineData(typeof(TransactionService))]
     [InlineData(typeof(MandateService))]
     [InlineData(typeof(OAuthTokenService))]
-    [InlineData(typeof(OrderService))]
     [InlineData(typeof(PaymentIntentService))]
     [InlineData(typeof(PaymentLinkService))]
     [InlineData(typeof(PaymentMethodService))]
@@ -128,5 +127,16 @@ public class ServiceCollectionExtensionsTest
         var priceService = provider.GetRequiredService<PriceService>();
         
         Assert.Equal("MyKey", priceService.Client.ApiKey);
+    }
+
+    [Fact]
+    public void ClientResolutionThrowsUsefulErrorWhenKeyNotSet()
+    {
+        var collection = new ServiceCollection();
+        collection.AddStripe();
+
+        var provider = collection.BuildServiceProvider();
+        var exception = Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<PriceService>());
+        Assert.Contains("SecretKey is required to make requests to Stripe API", exception.Message);
     }
 }
