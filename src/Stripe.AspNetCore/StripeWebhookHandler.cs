@@ -1,7 +1,5 @@
 using System.Runtime.CompilerServices;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Stripe.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -10,52 +8,37 @@ namespace Stripe.AspNetCore;
 public abstract partial class StripeWebhookHandler
 {
     private ILogger<StripeWebhookHandler>? _logger;
-    private StripeWebhookContext? _context;
 
-    public StripeWebhookContext Context
-    {
-        get
-        {
-            if (_context == null) throw new InvalidOperationException();
+    public StripeWebhookContext Context { get; init; }
 
-            return _context;
-        }
-        set => _context = value;
-    }
+    private ILogger<StripeWebhookHandler> Logger =>
+             _logger ??= Context.HttpContext.RequestServices
+                                   .GetService<ILogger<StripeWebhookHandler>>() ??
+                               NullLogger<StripeWebhookHandler>.Instance;
 
-    private ILogger<StripeWebhookHandler> Logger
-    {
-        get
-        {
-            if (_logger == null)
-            {
-                _logger = Context.HttpContext.RequestServices.GetService<ILogger<StripeWebhookHandler>>() ??
-                          NullLogger<StripeWebhookHandler>.Instance;
-            }
-
-            return _logger;
-        }
-    }
+    protected StripeWebhookHandler(StripeWebhookContext context) => Context = context;
 
     public async Task ExecuteAsync()
     {
-        HttpContext httpContext = Context.HttpContext;
-        HttpResponse response = httpContext.Response;
+        var httpContext = Context.HttpContext;
+        var response = httpContext.Response;
 
-        StripeOptions options = Context.StripeOptions;
+        var options = Context.StripeOptions;
         if (string.IsNullOrEmpty(options.WebhookSecret))
         {
-            throw new InvalidOperationException("WebhookSecret is required to validate events. " +
+            var ex = new InvalidOperationException("WebhookSecret is required to validate events. " +
                                                 "You can set it using Stripe:WebhookSecret configuration section or " +
                                                 "by passing the value to .AddStripe(o => o.WebhookSecret = \"whse_123\") call");
+            //TODO: log here
+            throw ex;
         }
 
         Event stripeEvent;
         try
         {
-            using StreamReader stream = new StreamReader(httpContext.Request.Body);
-            HttpRequest request = httpContext.Request;
-            string body = await stream.ReadToEndAsync();
+            using var stream = new StreamReader(httpContext.Request.Body);
+            var request = httpContext.Request;
+            var body = await stream.ReadToEndAsync();
             stripeEvent = EventUtility.ConstructEvent(
                 body,
                 request.Headers["Stripe-Signature"],
@@ -97,7 +80,7 @@ public abstract partial class StripeWebhookHandler
         LogLevel.Warning,
         1,
         "Exception occured while parsing the Stripe WebHook event payload.");
-    
+
     private static Action<ILogger, string, Exception> ExecutionError = LoggerMessage.Define<string>(
         LogLevel.Warning,
         2,
@@ -106,9 +89,9 @@ public abstract partial class StripeWebhookHandler
     private static Action<ILogger, string, Exception?> UnknownEvent = LoggerMessage.Define<string>(
         LogLevel.Warning,
         3,
-        "Event type {event_type} is not supported by this version of the library, consider upgrading." + 
+        "Event type {event_type} is not supported by this version of the library, consider upgrading." +
         "You can override the UnknownEventAsync method to suppress this log message.");
-    
+
     private static Action<ILogger, string, string, Exception?> UnhandledEvent = LoggerMessage.Define<string, string>(
         LogLevel.Warning,
         4,

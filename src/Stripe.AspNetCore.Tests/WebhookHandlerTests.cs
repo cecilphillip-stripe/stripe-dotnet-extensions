@@ -177,7 +177,7 @@ public class WebhookHandlerTests
     {
         private readonly List<Event> _invocations;
 
-        public MockHandler(List<Event> invocations)
+        public MockHandler(List<Event> invocations, StripeWebhookContext stripeWebhookContext): base(stripeWebhookContext)
         {
             _invocations = invocations;
         }

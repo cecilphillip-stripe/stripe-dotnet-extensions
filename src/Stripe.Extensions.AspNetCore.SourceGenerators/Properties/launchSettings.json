@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "Stripe.Extensions.AspNetCore.SourceGenerators": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "../../samples/Harness/Harness.csproj"
+    }
+  }
+}

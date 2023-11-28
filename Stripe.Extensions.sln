@@ -13,12 +13,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{FE8D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleCheckout", "samples\SampleCheckout\SampleCheckout.csproj", "{B1ADE3FD-88D9-4480-B0DB-256560DE8352}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.Extensions.SourceGenerator", "src\Stripe.Extensions.SourceGenerator\Stripe.Extensions.SourceGenerator.csproj", "{B8A7DE8E-D6C6-4122-9095-5F43D713F23F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.Extensions.SourceGenerators", "src\Stripe.Extensions.SourceGenerators\Stripe.Extensions.SourceGenerators.csproj", "{B8A7DE8E-D6C6-4122-9095-5F43D713F23F}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.AspNetCore", "src\Stripe.AspNetCore\Stripe.AspNetCore.csproj", "{9EE1B0FC-B484-43B3-8DB9-6EDBCB2C0A09}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gen", "src\gen\gen.csproj", "{1E45056C-58AB-4EBB-B880-AFC792926E06}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.AspNetCore.Tests", "src\Stripe.AspNetCore.Tests\Stripe.AspNetCore.Tests.csproj", "{FFD083DE-38B9-484C-B6EA-CE59683A7EC4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.Extensions.AspNetCore.SourceGenerators", "src\Stripe.Extensions.AspNetCore.SourceGenerators\Stripe.Extensions.AspNetCore.SourceGenerators.csproj", "{06C2FB48-2793-46B7-9420-DF1E5B56264D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harness", "samples\Harness\Harness.csproj", "{39572A96-CE38-4FC0-9B0D-33540D83F40E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +62,14 @@ Global
 		{FFD083DE-38B9-484C-B6EA-CE59683A7EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFD083DE-38B9-484C-B6EA-CE59683A7EC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFD083DE-38B9-484C-B6EA-CE59683A7EC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06C2FB48-2793-46B7-9420-DF1E5B56264D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06C2FB48-2793-46B7-9420-DF1E5B56264D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06C2FB48-2793-46B7-9420-DF1E5B56264D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06C2FB48-2793-46B7-9420-DF1E5B56264D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39572A96-CE38-4FC0-9B0D-33540D83F40E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39572A96-CE38-4FC0-9B0D-33540D83F40E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39572A96-CE38-4FC0-9B0D-33540D83F40E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39572A96-CE38-4FC0-9B0D-33540D83F40E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A4B643BF-EE09-4CB8-BFE4-22E9C8ED60C6} = {10927921-A55F-47E2-94BA-B72ECA788F50}
@@ -65,5 +78,7 @@ Global
 		{B8A7DE8E-D6C6-4122-9095-5F43D713F23F} = {10927921-A55F-47E2-94BA-B72ECA788F50}
 		{9EE1B0FC-B484-43B3-8DB9-6EDBCB2C0A09} = {10927921-A55F-47E2-94BA-B72ECA788F50}
 		{FFD083DE-38B9-484C-B6EA-CE59683A7EC4} = {10927921-A55F-47E2-94BA-B72ECA788F50}
+		{39572A96-CE38-4FC0-9B0D-33540D83F40E} = {FE8D9879-639A-4B46-A627-6DB1BCFA41E6}
+		{06C2FB48-2793-46B7-9420-DF1E5B56264D} = {10927921-A55F-47E2-94BA-B72ECA788F50}
 	EndGlobalSection
 EndGlobal
