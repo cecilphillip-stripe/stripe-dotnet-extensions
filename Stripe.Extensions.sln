@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{FE8D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleCheckout", "samples\SampleCheckout\SampleCheckout.csproj", "{B1ADE3FD-88D9-4480-B0DB-256560DE8352}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.Extensions.SourceGenerator", "src\Stripe.Extensions.SourceGenerator\Stripe.Extensions.SourceGenerator.csproj", "{B8A7DE8E-D6C6-4122-9095-5F43D713F23F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,10 +36,15 @@ Global
 		{B1ADE3FD-88D9-4480-B0DB-256560DE8352}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1ADE3FD-88D9-4480-B0DB-256560DE8352}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1ADE3FD-88D9-4480-B0DB-256560DE8352}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8A7DE8E-D6C6-4122-9095-5F43D713F23F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8A7DE8E-D6C6-4122-9095-5F43D713F23F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8A7DE8E-D6C6-4122-9095-5F43D713F23F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8A7DE8E-D6C6-4122-9095-5F43D713F23F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A4B643BF-EE09-4CB8-BFE4-22E9C8ED60C6} = {10927921-A55F-47E2-94BA-B72ECA788F50}
 		{26F4276D-1286-45D8-B5A2-07CE984F8F5A} = {10927921-A55F-47E2-94BA-B72ECA788F50}
 		{B1ADE3FD-88D9-4480-B0DB-256560DE8352} = {FE8D9879-639A-4B46-A627-6DB1BCFA41E6}
+		{B8A7DE8E-D6C6-4122-9095-5F43D713F23F} = {10927921-A55F-47E2-94BA-B72ECA788F50}
 	EndGlobalSection
 EndGlobal

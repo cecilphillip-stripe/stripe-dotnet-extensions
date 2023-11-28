@@ -1,13 +1,12 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Extensions.DependencyInjection;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class ServiceCollectionExtensions
+public static partial class StripeServiceCollectionExtensions
 {
     private const string HttpClientName = "Stripe";
 
@@ -64,31 +63,4 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static void RegisterStripeServices(IServiceCollection collection)
-    {
-        var stripeServiceTypes = typeof(StripeClient).Assembly.DefinedTypes
-            .Select(info => info.AsType())
-            .Where(t => t.IsClass && !t.IsAbstract && t.IsPublic &&
-                        t.Name.EndsWith("Service", StringComparison.Ordinal));
-
-        foreach (var type in stripeServiceTypes)
-            TryAddType(collection, type);
-    }
-
-    private static void TryAddType(IServiceCollection collection, Type type)
-    {
-        var constructorInfo = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
-        foreach (var constructor in constructorInfo)
-        {
-            var parameters = constructor.GetParameters();
-            foreach (var parameter in parameters)
-            {
-                if (parameter.ParameterType == typeof(IStripeClient))
-                {
-                    collection.TryAdd(ServiceDescriptor.Singleton(type, type));
-                    return;
-                }
-            }
-        }
-    }
 }

@@ -46,7 +46,6 @@ public class ServiceCollectionExtensionsTest
     [InlineData(typeof(TransactionService))]
     [InlineData(typeof(MandateService))]
     [InlineData(typeof(OAuthTokenService))]
-    [InlineData(typeof(OrderService))]
     [InlineData(typeof(PaymentIntentService))]
     [InlineData(typeof(PaymentLinkService))]
     [InlineData(typeof(PaymentMethodService))]
@@ -67,7 +66,6 @@ public class ServiceCollectionExtensionsTest
     [InlineData(typeof(SetupIntentService))]
     [InlineData(typeof(ShippingRateService))]
     [InlineData(typeof(ScheduledQueryRunService))]
-    [InlineData(typeof(SkuService))]
     [InlineData(typeof(SourceService))]
     [InlineData(typeof(SubscriptionItemService))]
     [InlineData(typeof(SubscriptionScheduleService))]
@@ -111,22 +109,22 @@ public class ServiceCollectionExtensionsTest
                     { "Stripe:SecretKey", "MyKey" }
                 }).Build());
         collection.AddStripe();
-        
+
         var provider = collection.BuildServiceProvider();
         var priceService = provider.GetRequiredService<PriceService>();
-        
+
         Assert.Equal("MyKey", priceService.Client.ApiKey);
     }
-    
+
     [Fact]
     public void UsesApiKeyProvidedDuringRegistration()
     {
         var collection = new ServiceCollection();
         collection.AddStripe("MyKey");
-        
+
         var provider = collection.BuildServiceProvider();
         var priceService = provider.GetRequiredService<PriceService>();
-        
+
         Assert.Equal("MyKey", priceService.Client.ApiKey);
     }
 }
