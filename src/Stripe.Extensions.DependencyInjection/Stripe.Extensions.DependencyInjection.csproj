@@ -17,9 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stripe.Extensions.SourceGenerator\Stripe.Extensions.SourceGenerator\Stripe.Extensions.SourceGenerator.csproj"
+    <ProjectReference Include="..\Stripe.Extensions.SourceGenerator\Stripe.Extensions.SourceGenerator.csproj"
                       OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     
   </ItemGroup>
-
 </Project>
