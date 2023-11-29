@@ -104,7 +104,7 @@ public class ServiceCollectionExtensionsTest
         var collection = new ServiceCollection();
         collection.AddSingleton<IConfiguration>(
             new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>()
+                .AddInMemoryCollection(new Dictionary<string, string?>()
                 {
                     { "Stripe:SecretKey", "MyKey" }
                 }).Build());
