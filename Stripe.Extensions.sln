@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.Extensions.SourceGen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.AspNetCore", "src\Stripe.AspNetCore\Stripe.AspNetCore.csproj", "{9EE1B0FC-B484-43B3-8DB9-6EDBCB2C0A09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gen", "src\gen\gen.csproj", "{1E45056C-58AB-4EBB-B880-AFC792926E06}"
-EndProject
 
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.Extensions.AspNetCore.SourceGenerators", "src\Stripe.Extensions.AspNetCore.SourceGenerators\Stripe.Extensions.AspNetCore.SourceGenerators.csproj", "{06C2FB48-2793-46B7-9420-DF1E5B56264D}"
 EndProject
@@ -53,10 +51,6 @@ Global
 		{9EE1B0FC-B484-43B3-8DB9-6EDBCB2C0A09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9EE1B0FC-B484-43B3-8DB9-6EDBCB2C0A09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9EE1B0FC-B484-43B3-8DB9-6EDBCB2C0A09}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1E45056C-58AB-4EBB-B880-AFC792926E06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E45056C-58AB-4EBB-B880-AFC792926E06}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1E45056C-58AB-4EBB-B880-AFC792926E06}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E45056C-58AB-4EBB-B880-AFC792926E06}.Release|Any CPU.Build.0 = Release|Any CPU
 		{06C2FB48-2793-46B7-9420-DF1E5B56264D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{06C2FB48-2793-46B7-9420-DF1E5B56264D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06C2FB48-2793-46B7-9420-DF1E5B56264D}.Release|Any CPU.ActiveCfg = Release|Any CPU
