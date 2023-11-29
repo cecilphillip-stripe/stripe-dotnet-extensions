@@ -42,7 +42,7 @@ namespace Microsoft.Extensions.DependencyInjection;
     }}
 ", Encoding.UTF8);
 
-        context.AddSource("Stripe.Extensions.Generated.cs", generatedCode);
+        context.AddSource("Stripe.Extensions.Registration.g.cs", generatedCode);
     }
 
     private string GenerateRegistrationCode(IEnumerable<INamedTypeSymbol> serviceTypes)

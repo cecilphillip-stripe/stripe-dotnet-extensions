@@ -31,7 +31,7 @@ namespace Stripe.AspNetCore;
     }}
 ", Encoding.UTF8);
 
-        context.AddSource("Stripe.Extensions.AspNetCore.Generated.cs", generatedCode);
+        context.AddSource("Stripe.Extensions.AspNetCore.g.cs", generatedCode);
     }
 
     private string GetEmbeddedResourceSpecJson()
