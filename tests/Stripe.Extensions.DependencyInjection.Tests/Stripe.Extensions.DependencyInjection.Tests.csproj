@@ -16,18 +16,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MELT.AspNetCore" Version="0.9.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.25" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stripe.AspNetCore\Stripe.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Stripe.Extensions.DependencyInjection\Stripe.Extensions.DependencyInjection.csproj" />
   </ItemGroup>
 </Project>
