@@ -29,7 +29,8 @@ public abstract partial class StripeWebhookHandler
             var ex = new InvalidOperationException("WebhookSecret is required to validate events. " +
                                                 "You can set it using Stripe:WebhookSecret configuration section or " +
                                                 "by passing the value to .AddStripe(o => o.WebhookSecret = \"whse_123\") call");
-            //TODO: log here
+
+            WebhookSecretValidationFailed(Logger, "Webhook Secret Validation Failed!", ex);
             throw ex;
         }
 
@@ -95,5 +96,10 @@ public abstract partial class StripeWebhookHandler
     private static Action<ILogger, string, string, Exception?> UnhandledEvent = LoggerMessage.Define<string, string>(
         LogLevel.Warning,
         4,
+        "Event type {event_type} does not have a handler. Override the {method_name} method to handle the event.");
+
+    private static Action<ILogger, string, Exception?> WebhookSecretValidationFailed = LoggerMessage.Define<string>(
+        LogLevel.Error,
+        5,
         "Event type {event_type} does not have a handler. Override the {method_name} method to handle the event.");
 }
