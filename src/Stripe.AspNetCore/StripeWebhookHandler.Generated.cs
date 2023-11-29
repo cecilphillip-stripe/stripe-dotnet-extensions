@@ -1,6 +1,7 @@
 namespace Stripe.AspNetCore;
-public partial class StripeWebhookHandler
+public abstract partial class StripeWebhookHandler
 {
+    /*
     /// Fired when the account.application.authorized event is received.
     public virtual Task OnAccountApplicationAuthorizedAsync(Event e) => UnhandledEventAsync(e);
 
@@ -872,5 +873,5 @@ public partial class StripeWebhookHandler
         "treasury.received_credit.succeeded" => OnTreasuryReceivedCreditSucceededAsync(e),
         "treasury.received_debit.created" => OnTreasuryReceivedDebitCreatedAsync(e),
         _ => UnknownEventAsync(e),
-    };
+    }; */
 }

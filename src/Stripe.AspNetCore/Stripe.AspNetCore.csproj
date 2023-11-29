@@ -1,21 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <OutputType>Library</OutputType>
     <GITHUB_RUN_NUMBER Condition="'$(GITHUB_RUN_NUMBER)' == ''">1</GITHUB_RUN_NUMBER>
     <Version>0.1.0-beta.$(GITHUB_RUN_NUMBER)</Version>
     <Version Condition="'$(ReleaseVersion)' != ''">$(ReleaseVersion)</Version>
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net6;net8</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Stripe.net" Version="40.14.0" />
+    <PackageReference Include="Stripe.net" Version="43.4.0" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Stripe.Extensions.DependencyInjection\Stripe.Extensions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Stripe.Extensions.AspNetCore.SourceGenerators\Stripe.Extensions.AspNetCore.SourceGenerators.csproj"
-                      OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+
+    <ProjectReference Include="..\Stripe.Extensions.DependencyInjection\Stripe.Extensions.DependencyInjection.csproj" />
+
   </ItemGroup>
 
 </Project>
