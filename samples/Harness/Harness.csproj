@@ -2,23 +2,24 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Dummy</RootNamespace>
+        <RootNamespace>Harness</RootNamespace>
     </PropertyGroup>
 
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Stripe.Extensions.AspNetCore.SourceGenerators\Stripe.Extensions.AspNetCore.SourceGenerators.csproj"
                         OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
-      
+
         <ProjectReference Include="..\..\src\Stripe.Extensions.SourceGenerators\Stripe.Extensions.SourceGenerators.csproj"
                         OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
 
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
       <PackageReference Include="Stripe.net" Version="43.4.0" />
     </ItemGroup>
 
