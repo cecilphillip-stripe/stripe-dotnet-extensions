@@ -15,14 +15,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: |
-          3.1.x
-          5.0.x
+        dotnet-version: |                    
           6.0.x
+          7.0.x
+          8.0.x
     - name: Build
       run: dotnet build
     - name: Test
@@ -55,7 +55,7 @@ jobs:
         name: nuget
         path: nuget
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
     - name: Add GitHub package source
@@ -66,7 +66,7 @@ jobs:
     needs: [build, publish]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Update package versions in the repo
         shell: pwsh
         run: ./eng/UpdateAllVersions.ps1 ${{ needs.build.outputs.PackageVersion }} ${{ github.workspace }}

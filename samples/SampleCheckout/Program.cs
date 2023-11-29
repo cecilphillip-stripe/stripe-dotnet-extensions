@@ -31,7 +31,7 @@ app.Run();
 public class MyWebhookHandler: StripeWebhookHandler
 {
     private readonly CustomerService _customerService;
-    public MyWebhookHandler(CustomerService customerService)
+    public MyWebhookHandler(CustomerService customerService, StripeWebhookContext context): base(context)
     {
         _customerService = customerService;
     }

@@ -13,7 +13,7 @@ public static class StripeAppBuilderExtensions
     {
         return endpointRouteBuilder.MapStripeWebhookHandler<T>("/webhook");
     }
-    
+
     public static IEndpointRouteBuilder MapStripeWebhookHandler<T>(this IEndpointRouteBuilder endpointRouteBuilder, string pattern)
         where T: StripeWebhookHandler
     {
@@ -23,11 +23,11 @@ public static class StripeAppBuilderExtensions
             throw new InvalidOperationException("Stripe services were not registered. Please call services.AddStripe()");
         }
 
-        var handlerFactory = ActivatorUtilities.CreateFactory(typeof(T), Array.Empty<Type>());
+        var handlerFactory = ActivatorUtilities.CreateFactory(typeof(T), new[]{typeof(StripeWebhookContext)});
         endpointRouteBuilder.Map(pattern, async context =>
         {
-            var handler = (T)handlerFactory(context.RequestServices, Array.Empty<object>());
-            handler.Context = new StripeWebhookContext(context, options.Value);
+            var stripeWebhookContext = new StripeWebhookContext(context, options.Value);
+            var handler = (T)handlerFactory(context.RequestServices, new object?[]{stripeWebhookContext} );
             await handler.ExecuteAsync();
         });
 
