@@ -29,5 +29,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Stripe.Extensions.AspNetCore\Stripe.Extensions.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Stripe.Extensions.DependencyInjection\Stripe.Extensions.DependencyInjection.csproj" />
   </ItemGroup>
 </Project>
