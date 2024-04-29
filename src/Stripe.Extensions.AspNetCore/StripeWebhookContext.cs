@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Stripe.Extensions.DependencyInjection;
 
-namespace Stripe.AspNetCore;
+namespace Stripe.Extensions.AspNetCore;
 
 public class StripeWebhookContext
 {

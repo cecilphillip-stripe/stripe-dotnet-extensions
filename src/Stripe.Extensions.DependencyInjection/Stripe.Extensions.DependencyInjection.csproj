@@ -2,14 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <GITHUB_RUN_NUMBER Condition="'$(GITHUB_RUN_NUMBER)' == ''">1</GITHUB_RUN_NUMBER>
-    <Version>0.1.0-beta.$(GITHUB_RUN_NUMBER)</Version>
-    <Version Condition="'$(ReleaseVersion)' != ''">$(ReleaseVersion)</Version>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Stripe.Extensions.DependencyInjection</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Stripe.net" Version="43.4.0" />
+    <PackageReference Include="Stripe.net" Version="44.4.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
@@ -21,4 +19,6 @@
     <ProjectReference Include="..\Stripe.Extensions.SourceGenerators\Stripe.Extensions.SourceGenerators.csproj"
                       OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
   </ItemGroup>
+
+
 </Project>

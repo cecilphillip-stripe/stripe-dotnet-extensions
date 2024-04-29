@@ -2,14 +2,12 @@
 
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <GITHUB_RUN_NUMBER Condition="'$(GITHUB_RUN_NUMBER)' == ''">1</GITHUB_RUN_NUMBER>
-    <Version>0.1.0-beta.$(GITHUB_RUN_NUMBER)</Version>
-    <Version Condition="'$(ReleaseVersion)' != ''">$(ReleaseVersion)</Version>
     <TargetFrameworks>net6;net8</TargetFrameworks>
+    <RootNamespace>Stripe.Extensions.AspNetCore</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Stripe.net" Version="43.4.0" />
+    <PackageReference Include="Stripe.net" Version="44.4.0" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 

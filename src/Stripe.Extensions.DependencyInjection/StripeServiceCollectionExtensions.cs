@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Extensions.DependencyInjection;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static partial class StripeServiceCollectionExtensions
@@ -68,5 +69,4 @@ public static partial class StripeServiceCollectionExtensions
         RegisterStripeServices(services);
         return services;
     }
-
 }
