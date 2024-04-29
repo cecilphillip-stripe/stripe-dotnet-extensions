@@ -12,10 +12,9 @@
 
         <IncludeBuildOutput>false</IncludeBuildOutput> <!-- Do not include the generator as a lib dependency -->
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-
-        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <IsRoslynComponent>true</IsRoslynComponent>
 
+        <EmitCompilerGeneratedFiles>false</EmitCompilerGeneratedFiles>
         <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
     </PropertyGroup>
 
@@ -35,10 +34,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
 
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.6.0"/>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.6.0"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
 
-        <PackageReference Include="System.Text.Json" Version="7.0.4" PrivateAssets="all" GeneratePathProperty="true" />
+        <PackageReference Include="System.Text.Json" Version="8.0.3" PrivateAssets="all" GeneratePathProperty="true" />
         <None Include="$(PkgSystem_Text_Json)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
 
         <PackageReference Include="MrMeeseeks.SourceGeneratorUtility" Version="1.0.11" PrivateAssets="all" GeneratePathProperty="true" />

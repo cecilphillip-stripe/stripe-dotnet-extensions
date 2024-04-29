@@ -20,15 +20,15 @@ public class StripeWebhookHandlerGenerator : ISourceGenerator
         var generatedCode = SourceText.From($@"
 using Stripe;
 
-namespace Stripe.AspNetCore;
+namespace Stripe.Extensions.AspNetCore;
 
-    public abstract partial class StripeWebhookHandler
-    {{
+public abstract partial class StripeWebhookHandler
+{{
        
-            // generated code
-            {handlerCode}
+    // generated code
+{handlerCode}
     
-    }}
+}}
 ", Encoding.UTF8);
 
         context.AddSource("Stripe.Extensions.AspNetCore.g.cs", generatedCode);
@@ -81,7 +81,7 @@ namespace Stripe.AspNetCore;
 
         foreach (var method in methods)
         {
-            builder.AppendLine($@"    /// Fired when the {method.EventName} event is received.");
+            builder.AppendLine($@"    // Fired when the {method.EventName} event is received.");
             builder.AppendLine($@"    public virtual Task {method.MethodName}(Event e) => UnhandledEventAsync(e);");
             builder.AppendLine();
         }

@@ -52,7 +52,7 @@ namespace Microsoft.Extensions.DependencyInjection;
                     .NameAndContainingTypesAndNamespaces);
 
         // Generate code to register each service type with Transient lifetime
-        var registrationCode = string.Join("\n", serviceTypes
+        var registrationCode = string.Join("\n            ", serviceTypes
             .Select(serviceType =>
                 $"services.AddTransient<{serviceType.ToDisplayString(displayFormat)}>(provider => new {serviceType.ToDisplayString(displayFormat)}(provider.GetService<IStripeClient>()));"));
 
