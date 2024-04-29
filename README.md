@@ -1,18 +1,19 @@
-# Stripe ASP.NET Core integration
+# Stripe .NET Extensions
 
-Stripe ASP.NET Core provides Stripe SDK integration for dependency injection, configuration, logging and Webhook handling. 
+The Stripe .NET Extension packages provide a collection of convenient features 
+to help improve the experience integrating Stripe in .NET applications.  integration for dependency injection, configuration, logging and Webhook handling. 
+
 
 ## Install
 
-```xml
-<ItemGroup>
-    <PackageReference Include="Stripe.AspNetCore" Version="0.1.0" />
-</ItemGroup>
+```shell
+dotnet install Stripe.Extensions
+dotnet install Stripe.Extensions.AspNetCore
 ```
 
 ## Usage
 
-Use the `services.AddStripe()` method to register Stripe services in Dependency Injection container:
+Use the `IServiceCollection.AddStripe()` extension method to register Stripe services in Dependency Injection container:
 
 ```C#
 // Startup-based apps
@@ -25,7 +26,7 @@ public void ConfigureServices(IServiceCollection services)
 builder.Services.AddStripe();
 ```
 
-You can now reference Stripe services from you controllers and other places that support dependency injection:
+Now you can inject Stripe services into your application components.
 
 ```C#
 public class HomeController : Controller
@@ -36,14 +37,13 @@ public class HomeController : Controller
     {
         _productService = productService;
     }
-    
 }
 ```
 
 ### Configuration
 
-The API Key needs to be set calls can be made using Stripe SDK.
-You can store the API key in the `Stripe` section of the `appsettings.json` or by passing the configuration action to `.AddStripe` call.
+The Stripe [API keys](https://docs.stripe.com/keys#obtain-api-keys) need to be configured so calls can be made using Stripe SDK.
+The Stripe Extensions will look for a `Stripe` configuration section ...
 
 
 ```json
@@ -54,6 +54,8 @@ You can store the API key in the `Stripe` section of the `appsettings.json` or b
   }
 }
 ```
+
+or you can update the settings via a `.AddStripe` call.
 
 ```C#
 builder.Services.AddStripe(o => {
@@ -162,3 +164,12 @@ public async Task UpdatesCustomerOnCreation()
             It.IsAny<CancellationToken>()));
 }
 ```
+
+
+### Useful links
+- [Stripe Docs](https://docs.stripe.com)
+- [Stripe API Reference](https://docs.stripe.com/api)
+
+To keep track of major Stripe API updates and versions, reference the 
+[API upgrades page](https://docs.stripe.com/upgrades#api-versions) in the Stripe documentation. 
+For a detailed list of API changes, please refer to our [API Changelog](https://docs.stripe.com/changelog).
