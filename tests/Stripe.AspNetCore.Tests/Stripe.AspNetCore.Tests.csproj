@@ -28,6 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Stripe.AspNetCore\Stripe.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Stripe.Extensions.AspNetCore\Stripe.Extensions.AspNetCore.csproj" />
   </ItemGroup>
 </Project>
