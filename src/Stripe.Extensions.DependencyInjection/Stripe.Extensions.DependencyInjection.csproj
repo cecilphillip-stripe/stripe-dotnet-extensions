@@ -5,6 +5,25 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Stripe.Extensions.DependencyInjection</RootNamespace>
   </PropertyGroup>
+  
+  <PropertyGroup>
+    <Authors>stripe,cecilphillip</Authors>
+    <Description>Stripe .NET extension library to help with DI registration. </Description>
+    <IncludeSymbols>true</IncludeSymbols>
+    <PackageId>Stripe.Extensions.DependencyInjection</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>stripe;dotnet;dependencyinjection;payments;</PackageTags>
+<!--    <PackageProjectUrl> </PackageProjectUrl>-->
+<!--    <RepositoryUrl> </RepositoryUrl>-->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>stripe_logo_blurple.png</PackageIcon>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\stripe_logo_blurple.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Stripe.net" Version="44.4.0" />
@@ -19,6 +38,4 @@
     <ProjectReference Include="..\Stripe.Extensions.SourceGenerators\Stripe.Extensions.SourceGenerators.csproj"
                       OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
   </ItemGroup>
-
-
 </Project>
