@@ -1,38 +1,35 @@
+using System.Collections.Generic;
+using JetBrains.Annotations;
 using Nuke.Common;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
-using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Utilities.Collections;
-using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using Nuke.Components;
 using Serilog;
 
 namespace ExtensionsBuild;
 
-class Build : NukeBuild
+class Build : NukeBuild, IPack, ITest
 {
     public static int Main() => Execute<Build>(x => x.Print);
 
-    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-
-    [Solution(GenerateProjects = true)] [Required] readonly Solution Solution;
-
-    string BaseExProjectName => "Stripe.Extensions";
-    string StripeExDepInjectProjectName => $"{BaseExProjectName}.DependencyInjection";
-    string StripeExAspNetCoreProjectName => $"{BaseExProjectName}.AspNetCore";
+    // string BaseExProjectName => "Stripe.Extensions";
+    //string StripeExDepInjectProjectName => $"{BaseExProjectName}.DependencyInjection";
+    //string StripeExAspNetCoreProjectName => $"{BaseExProjectName}.AspNetCore";
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
     AbsolutePath SamplesDirectory => RootDirectory / "samples";
-    AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
-
+    
+    
     Target Print => target => target
         .Unlisted()
         .Description("Prints resolved project metadata")
         .Executes(() =>
         {
-            Log.Information("Solution path = {Value}", Solution);
-            Log.Information("Solution directory = {Value}", Solution.Directory);
+            var solution = (this as IHazSolution).Solution;
+            Log.Information("Solution path = {Value}", solution.Path);
+            Log.Information("Solution directory = {Value}", solution.Directory);
         });
 
     Target CleanSamples => target => target
@@ -59,29 +56,15 @@ class Build : NukeBuild
                 .ForEach(static dir => dir.DeleteDirectory());
         });
 
+    [PublicAPI]
     Target Clean => target => target
         .Description("Clean all projects directories")
         .DependsOn(CleanSamples, CleanTests, CleanSource)
         .Executes(() =>
         {
-            ArtifactsDirectory.CreateOrCleanDirectory();
+            (this as IHazArtifacts).ArtifactsDirectory
+                .CreateOrCleanDirectory();
         });
-
-    Target Restore => target => target
-        .DependsOn(Clean)
-        .Executes(() =>
-        {
-            DotNetRestore(s => s
-                .SetProjectFile(Solution));
-        });
-
-    Target Compile => target => target
-        .DependsOn(Restore)
-        .Executes(() =>
-        {
-            DotNetBuild(s => s
-                .SetProjectFile(Solution)
-                .SetConfiguration(Configuration)
-                .EnableNoRestore());
-        });
+    
+    public IEnumerable<Project> TestProjects => (this as IHazSolution).Solution.GetAllProjects("*.Tests");
 }

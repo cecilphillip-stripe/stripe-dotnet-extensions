@@ -10,8 +10,7 @@
         <CheckEolTargetFramework>true</CheckEolTargetFramework>
         <DebugType>embedded</DebugType>
     </PropertyGroup>
-
-
+    
     <PropertyGroup>
         <IsTestProject Condition="$(MSBuildProjectName.Contains('Test'))">true</IsTestProject>
     </PropertyGroup>
