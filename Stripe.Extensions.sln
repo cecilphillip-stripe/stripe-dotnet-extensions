@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.AspNetCore.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.Extensions.DependencyInjection.Tests", "tests\Stripe.Extensions.DependencyInjection.Tests\Stripe.Extensions.DependencyInjection.Tests.csproj", "{66DDC5B6-42B8-4DE6-BE7B-6A021C135184}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtensionsBuild", "build\ExtensionsBuild.csproj", "{AF047E3D-8450-475B-945F-B604D64D81A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF047E3D-8450-475B-945F-B604D64D81A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF047E3D-8450-475B-945F-B604D64D81A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4B643BF-EE09-4CB8-BFE4-22E9C8ED60C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A4B643BF-EE09-4CB8-BFE4-22E9C8ED60C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4B643BF-EE09-4CB8-BFE4-22E9C8ED60C6}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -4,9 +4,10 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-        <GenerateDocumentationFile Condition="'$(IsTestProject)' == 'false'">true</GenerateDocumentationFile>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
         <EnableNETAnalyzers>true</EnableNETAnalyzers>
-        <CheckEolTargetFramework>false</CheckEolTargetFramework>
+        <CheckEolTargetFramework>true</CheckEolTargetFramework>
         <DebugType>embedded</DebugType>
     </PropertyGroup>
 
@@ -16,13 +17,15 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Authors>Cecil Phillip, Pavel Krymets</Authors>
+        <Authors>Cecil Phillip, Pavel Krymets, Stripe</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/cecilphillip-stripe/stripe-dotnet-extensions</RepositoryUrl>
+        
         <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/cecilphillip-stripe/stripe-dotnet-extensions</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <IncludeSymbols>true</IncludeSymbols>
+        
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
     </PropertyGroup>
 </Project>
