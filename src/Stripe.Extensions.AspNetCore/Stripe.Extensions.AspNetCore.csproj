@@ -7,6 +7,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
+    <IsPackable>true</IsPackable>
     <Description>Stripe .NET extension library to help with DI registration. </Description>
     <PackageId>Stripe.Extensions.AspNetCore</PackageId>
     <PackageTags>stripe;dotnet;aspnetcore;webhooks;payments;dependencyinjection;</PackageTags>

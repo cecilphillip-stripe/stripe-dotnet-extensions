@@ -46,6 +46,15 @@
           "type": "boolean",
           "description": "Ignore unreachable sources during Restore"
         },
+        "MinVerMinimumMajorMinor": {
+          "type": "string"
+        },
+        "MinVerPreReleaseIdentifiers": {
+          "type": "string"
+        },
+        "MinVerTagPrefix": {
+          "type": "string"
+        },
         "NoLogo": {
           "type": "boolean",
           "description": "Disables displaying the NUKE logo"
