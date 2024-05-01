@@ -16,8 +16,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
-    <None Include="..\..\stripe_logo_blurple.png" Pack="true" PackagePath="\" />
+    <None Include="..\..\README.md" Visible="false" Pack="true" PackagePath="\" />
+    <None Include="..\..\stripe_logo_blurple.png"  Visible="false" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>

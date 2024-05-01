@@ -12,10 +12,10 @@ public static partial class StripeServiceCollectionExtensions
     private const string HttpClientName = "Stripe";
 
     public static IServiceCollection AddStripe(this IServiceCollection services)
-        => services.AddStripe(options => { });
+        => services.AddStripe(_ => { });
 
-    public static IServiceCollection AddStripe(this IServiceCollection services, string apiKey)
-        => services.AddStripe(options => options.SecretKey = apiKey);
+    public static IServiceCollection AddStripe(this IServiceCollection services, string secretKey)
+        => services.AddStripe(options => options.SecretKey = secretKey);
 
     public static IServiceCollection AddStripe(this IServiceCollection services, Action<StripeOptions> configureOptions)
         => services.AddStripe((options, _) => configureOptions(options));
@@ -32,7 +32,7 @@ public static partial class StripeServiceCollectionExtensions
         services.AddOptions<StripeOptions>()
             .Configure(options =>
             {
-                var asm = Assembly.GetExecutingAssembly().GetName();
+                var asm = Assembly.GetAssembly(typeof(StripeOptions)).GetName();
                 options.AppInfo ??= new AppInfo
                 {
                     Name = asm.Name,

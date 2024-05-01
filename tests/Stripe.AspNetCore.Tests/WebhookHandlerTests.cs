@@ -138,7 +138,7 @@ public class WebhookHandlerTests
     }
 
     [Fact]
-    public async Task CanDisableAPIVersionCheck()
+    public async Task CanDisableApiVersionCheck()
     {
         ITestLoggerSink testSink;
 
@@ -194,13 +194,13 @@ public class WebhookHandlerTests
         }
     }
 
-    private static readonly UTF8Encoding SafeUTF8
+    private static readonly UTF8Encoding SafeUtf8
         = new (encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
 
     private static string ComputeSignature(string secret, string timestamp, string payload)
     {
-        var secretBytes = SafeUTF8.GetBytes(secret);
-        var payloadBytes = SafeUTF8.GetBytes($"{timestamp}.{payload}");
+        var secretBytes = SafeUtf8.GetBytes(secret);
+        var payloadBytes = SafeUtf8.GetBytes($"{timestamp}.{payload}");
 
         using (var cryptographer = new HMACSHA256(secretBytes))
         {

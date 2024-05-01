@@ -89,7 +89,7 @@ class Build : NukeBuild, IPack, ITest
     protected override void OnBuildInitialized()
     {
         base.OnBuildInitialized();
-        var version = MinVerTasks.MinVer(s => s
+        var version = MinVerTasks.MinVer(settings => settings
                 .SetTagPrefix(MinVerTagPrefix)
                 .SetMinimumMajorMinor(MinVerMinimumMajorMinor)
                 .SetProcessEnvironmentVariable("MinVerDefaultPreReleaseIdentifiers", MinVerPreReleaseIdentifiers)
