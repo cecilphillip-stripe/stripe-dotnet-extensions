@@ -26,7 +26,7 @@ public class WebhookHandlerTests
                 {
                     o.WebhookSecret = _secret;
                     configureOptions?.Invoke(o);
-                })
+                }).Services
                 .AddRouting()
                 .AddLogging(l => l.AddTest())
                 .AddSingleton(_invocations))

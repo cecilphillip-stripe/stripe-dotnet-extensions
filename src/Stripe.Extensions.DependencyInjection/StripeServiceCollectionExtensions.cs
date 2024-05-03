@@ -11,22 +11,22 @@ public static partial class StripeServiceCollectionExtensions
 {
     private const string HttpClientName = "Stripe";
 
-    public static IServiceCollection AddStripe(this IServiceCollection services)
+    public static IStripeClientBuilder AddStripe(this IServiceCollection services)
         => services.AddStripe(_ => { });
 
-    public static IServiceCollection AddStripe(this IServiceCollection services, string secretKey)
+    public static IStripeClientBuilder AddStripe(this IServiceCollection services, string secretKey)
         => services.AddStripe(options => options.SecretKey = secretKey);
 
-    public static IServiceCollection AddStripe(this IServiceCollection services, Action<StripeOptions> configureOptions)
+    public static IStripeClientBuilder AddStripe(this IServiceCollection services, Action<StripeOptions> configureOptions)
         => services.AddStripe((options, _) => configureOptions(options));
 
-    public static IServiceCollection AddStripe(this IServiceCollection services, IConfiguration config)
+    public static IStripeClientBuilder AddStripe(this IServiceCollection services, IConfiguration config)
     {
         if (config == null) throw new ArgumentNullException(nameof(config));
         return services.AddStripe(config.Bind);
     }
 
-    public static IServiceCollection AddStripe(this IServiceCollection services,
+    public static IStripeClientBuilder AddStripe(this IServiceCollection services,
         Action<StripeOptions, IServiceProvider> configureOptions)
     {
         services.AddOptions<StripeOptions>()
@@ -46,7 +46,8 @@ public static partial class StripeServiceCollectionExtensions
             })
             .Configure(configureOptions);
 
-        services.AddHttpClient(HttpClientName);
+        var clientBuilder = services.AddHttpClient(HttpClientName);
+        
         services.AddSingleton<IStripeClient, StripeClient>(s =>
         {
             var stripeOptions = s.GetRequiredService<IOptions<StripeOptions>>().Value;
@@ -67,6 +68,14 @@ public static partial class StripeServiceCollectionExtensions
         });
 
         RegisterStripeServices(services);
-        return services;
+        return new StripeClientBuilder(clientBuilder);
     }
 }
+
+internal sealed class StripeClientBuilder(IHttpClientBuilder httpClientBuilder) : IStripeClientBuilder
+{
+    public string Name => httpClientBuilder.Name;
+    public IServiceCollection Services => httpClientBuilder.Services;
+}
+
+public interface IStripeClientBuilder: IHttpClientBuilder { }

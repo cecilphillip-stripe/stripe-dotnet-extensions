@@ -8,7 +8,7 @@
   
   <PropertyGroup>
     <IsPackable>true</IsPackable>
-    <Description>Stripe .NET extension library to help with DI registration. </Description>
+    <Description>Stripe .NET extension for ASP.NET Core</Description>
     <PackageId>Stripe.Extensions.AspNetCore</PackageId>
     <PackageTags>stripe;dotnet;aspnetcore;webhooks;payments;dependencyinjection;</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -21,7 +21,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Stripe.net" Version="44.4.0" />
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
