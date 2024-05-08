@@ -10,7 +10,7 @@
         <CheckEolTargetFramework>true</CheckEolTargetFramework>
         <DebugType>embedded</DebugType>
     </PropertyGroup>
-    
+
     <PropertyGroup>
         <IsTestProject Condition="$(MSBuildProjectName.Contains('Test'))">true</IsTestProject>
     </PropertyGroup>
@@ -19,18 +19,18 @@
         <Authors>Cecil Phillip, Pavel Krymets</Authors>
         <Company>Stripe</Company>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        
+
         <PackageProjectUrl>$(RepositoryUrl)</PackageProjectUrl>
         <RepositoryUrl>https://github.com/cecilphillip-stripe/stripe-dotnet-extensions</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        
+
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
-        
+
         <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
     </PropertyGroup>
-    
+
     <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
