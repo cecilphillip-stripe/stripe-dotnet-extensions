@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFrameworks>net6;net8</TargetFrameworks>
+    <RootNamespace>Stripe.Extensions.AspNetCore</RootNamespace>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <Description>Stripe .NET extension for ASP.NET Core</Description>
+    <PackageId>Stripe.Extensions.AspNetCore</PackageId>
+    <PackageTags>stripe;dotnet;aspnetcore;webhooks;payments;dependencyinjection;</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>stripe_logo_blurple.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Visible="false" Pack="true" PackagePath="\" />
+    <None Include="..\..\stripe_logo_blurple.png"  Visible="false" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Stripe.Extensions.AspNetCore.SourceGenerators\Stripe.Extensions.AspNetCore.SourceGenerators.csproj"
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+
+    <ProjectReference Include="..\Stripe.Extensions.DependencyInjection\Stripe.Extensions.DependencyInjection.csproj" />
+
+  </ItemGroup>
+</Project>

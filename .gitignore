@@ -350,3 +350,6 @@ MigrationBackup/
 .ionide/
 
 .idea/
+
+.nuke/temp/
+**/.DS_Store
