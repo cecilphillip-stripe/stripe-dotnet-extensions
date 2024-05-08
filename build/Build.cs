@@ -13,20 +13,19 @@ using Serilog;
 
 namespace ExtensionsBuild;
 
-class Build : NukeBuild, IPack, ITest
+class Build : NukeBuild, IPublish
 {
     public static int Main() => Execute<Build>(x => x.Print);
 
-    // string BaseExProjectName => "Stripe.Extensions";
-    // string StripeExDepInjectProjectName => $"{BaseExProjectName}.DependencyInjection";
-    // string StripeExAspNetCoreProjectName => $"{BaseExProjectName}.AspNetCore";
-    
     MinVer MinVerInfo { get; set; }
     [GitRepository] GitRepository GitRepo { get; }
 
     [Parameter] readonly string MinVerTagPrefix;
     [Parameter] readonly string MinVerPreReleaseIdentifiers;
     [Parameter] readonly string MinVerMinimumMajorMinor;
+
+    [Parameter] readonly string NuGetApiKey;
+    [Parameter] readonly string NugGetUrl;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
@@ -85,7 +84,7 @@ class Build : NukeBuild, IPack, ITest
     public Configure<DotNetPackSettings> PackSettings => settings => settings
         .SetVersion(MinVerInfo.Version)
         .SetRepositoryUrl(GitRepo.HttpsUrl);
-    
+
     protected override void OnBuildInitialized()
     {
         base.OnBuildInitialized();
