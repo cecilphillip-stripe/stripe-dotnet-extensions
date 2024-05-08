@@ -6,6 +6,14 @@ on:
         - main
 
     workflow_dispatch:
+      inputs:
+        packregistry:
+          description: 'Package registry to publish to'
+          type: choice
+          required: true
+          options:
+            - 'GitHub'
+            - 'NuGet'
 
 defaults:
   run:
@@ -86,14 +94,25 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup .NET
+    - name: Setup .NET for GitHub Packages
       uses: actions/setup-dotnet@v4
+      if: github.event.inputs.packregistry == 'GitHub'
       with:
         dotnet-version: '8.0.x'
         dotnet-quality: 'ga'
       env:
         NUGET_API_KEY: ${{ secrets.GITHUB_TOKEN }}
         NUGET_SOURCE: https://nuget.pkg.github.com/cecilphillip-stripe/index.json
+
+    - name: Setup .NET for NuGet
+      uses: actions/setup-dotnet@v4
+      if: github.event.inputs.packregistry == 'NuGet'
+      with:
+          dotnet-version: '8.0.x'
+          dotnet-quality: 'ga'
+      env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          NUGET_SOURCE: https://api.nuget.org/v3/index.json
 
     - name: Publish Packages
       run: |
