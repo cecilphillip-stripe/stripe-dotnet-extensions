@@ -1,10 +1,12 @@
+using Microsoft.Extensions.Http.Resilience;
 using Stripe;
 using Stripe.Extensions.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddStripe();
+builder.Services.AddStripe()
+    .AddStandardResilienceHandler();
 
 var app = builder.Build();
 
