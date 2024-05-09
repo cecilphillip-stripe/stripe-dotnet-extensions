@@ -94,27 +94,18 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Setup .NET for GitHub Packages
+    - name: Setup .NET
       uses: actions/setup-dotnet@v4
-      if: github.event.inputs.packregistry == 'GitHub'
       with:
         dotnet-version: '8.0.x'
         dotnet-quality: 'ga'
-      env:
-        NUGET_API_KEY: ${{ secrets.GITHUB_TOKEN }}
-        NUGET_SOURCE: https://nuget.pkg.github.com/cecilphillip-stripe/index.json
 
-    - name: Setup .NET for NuGet
-      uses: actions/setup-dotnet@v4
-      if: github.event.inputs.packregistry == 'NuGet'
-      with:
-          dotnet-version: '8.0.x'
-          dotnet-quality: 'ga'
-      env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-          NUGET_SOURCE: https://api.nuget.org/v3/index.json
-
-    - name: Publish Packages
+    - name: Publish packages to GitHub
+      if: github.event.inputs.packregistry == 'GitHub'
       run: |
-        ./build publish 
-        
+        ./build publish --NuGetSource https://nuget.pkg.github.com/cecilphillip-stripe/index.json --NuGetApiKey ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Publish packages to NuGet
+      if: github.event.inputs.packregistry == 'NuGet'
+      run: |
+        ./build publish --NuGetSource https://api.nuget.org/v3/index.json --NuGetApiKey ${{ secrets.NUGET_API_KEY }}
