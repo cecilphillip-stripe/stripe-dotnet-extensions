@@ -13,6 +13,10 @@ using Serilog;
 
 namespace ExtensionsBuild;
 
+[DisableDefaultOutput(
+    DefaultOutput.Logo,
+    DefaultOutput.TargetOutcome,
+    DefaultOutput.BuildOutcome)]
 class Build : NukeBuild, IPublish
 {
     public static int Main() => Execute<Build>(x => x.Print);
