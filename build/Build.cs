@@ -28,9 +28,6 @@ class Build : NukeBuild, IPublish
     [Parameter] readonly string MinVerPreReleaseIdentifiers;
     [Parameter] readonly string MinVerMinimumMajorMinor;
 
-    [Parameter] readonly string NuGetApiKey;
-    [Parameter] readonly string NugGetUrl;
-
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
     AbsolutePath SamplesDirectory => RootDirectory / "samples";
