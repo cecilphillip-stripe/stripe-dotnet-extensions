@@ -1,81 +1,70 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Stripe;
 using Stripe.Extensions.DependencyInjection;
+using static Stripe.Extensions.DependencyInjection.StripeOptions;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static partial class StripeServiceCollectionExtensions
 {
-    private const string HttpClientName = "Stripe";
-
-    public static IStripeClientBuilder AddStripe(this IServiceCollection services)
-        => services.AddStripe(_ => { });
-
-    public static IStripeClientBuilder AddStripe(this IServiceCollection services, string secretKey)
-        => services.AddStripe(options => options.SecretKey = secretKey);
-
-    public static IStripeClientBuilder AddStripe(this IServiceCollection services, Action<StripeOptions> configureOptions)
-        => services.AddStripe((options, _) => configureOptions(options));
-
-    public static IStripeClientBuilder AddStripe(this IServiceCollection services, IConfiguration config)
-    {
-        if (config == null) throw new ArgumentNullException(nameof(config));
-        return services.AddStripe(config.Bind);
-    }
-
     public static IStripeClientBuilder AddStripe(this IServiceCollection services,
-        Action<StripeOptions, IServiceProvider> configureOptions)
+        string clientName = DefaultClientConfigurationSectionName)
     {
-        services.AddOptions<StripeOptions>()
-            .Configure(options =>
-            {
-                var asm = Assembly.GetAssembly(typeof(StripeOptions)).GetName();
-                options.AppInfo ??= new AppInfo
-                {
-                    Name = asm.Name,
-                    Version = asm.Version?.ToString()
-                };
-            })
+        if (services is null)
+            throw new ArgumentNullException(nameof(services));
+
+        if (clientName is null)
+            throw new ArgumentNullException(nameof(clientName));
+
+        // Register the named stripe client with configuration section
+        services.AddOptions<StripeOptions>(clientName)
+            .Configure(ConfigureStripeOptions)
             .Configure<IServiceProvider>((options, provider) =>
-            {
-                var configuration = provider.GetService<IConfiguration>();
-                configuration?.GetSection(StripeOptions.ConfigurationSectionName).Bind(options);
-            })
-            .Configure(configureOptions);
-
-        var clientBuilder = services.AddHttpClient(HttpClientName);
+                BindOptionsConfiguration(clientName, options, provider));
         
-        services.AddSingleton<IStripeClient, StripeClient>(s =>
+        AddStripeServiceProvider(services);
+        return services.RegisterClientServices(clientName);
+        
+        static void ConfigureStripeOptions(StripeOptions options)
         {
-            var stripeOptions = s.GetRequiredService<IOptions<StripeOptions>>().Value;
-            if (string.IsNullOrEmpty(stripeOptions.SecretKey))
+            var asm = Assembly.GetAssembly(typeof(StripeOptions)).GetName();
+            options.AppInfo ??= new AppInfo
             {
-                throw new InvalidOperationException("SecretKey is required to make requests to Stripe API. " +
-                                                    "You can set it using Stripe:SecretKey configuration section or " +
-                                                    "by passing the value to .AddStripe(\"key\") call");
-            }
-            var clientFactory = s.GetRequiredService<IHttpClientFactory>();
-            var systemHttpClient = new SystemNetHttpClient(
-                httpClient: clientFactory.CreateClient(HttpClientName),
-                maxNetworkRetries: stripeOptions.MaxNetworkRetries,
-                appInfo: stripeOptions.AppInfo,
-                enableTelemetry: stripeOptions.EnableTelemetry);
+                Name = asm.Name,
+                Version = asm.Version?.ToString()
+            };
+        }
 
-            return new StripeClient(apiKey: stripeOptions.SecretKey, httpClient: systemHttpClient);
-        });
+        static void BindOptionsConfiguration(string clientName, StripeOptions options, IServiceProvider provider)
+        {
+            var configuration = provider.GetService<IConfiguration>();
+            var configSection = configuration?.GetSection(clientName);
 
-        RegisterStripeServices(services);
-        return new StripeClientBuilder(clientBuilder);
+            if (configSection == null) return;
+            configSection.Bind(options);
+        }
+    }
+    
+    private static IStripeClientBuilder RegisterClientServices(this IServiceCollection services, string clientName)
+    {
+        var httpClientBuilder = services.AddHttpClient(clientName);
+        var stripeClientBuilder=  new StripeClientBuilder(httpClientBuilder);
+      
+        services.AddKeyedScoped<IStripeClient, StripeClient>(clientName, (serviceProvider, _) => stripeClientBuilder.Build(serviceProvider));      
+        
+        if (clientName == DefaultClientConfigurationSectionName)
+        {
+            services.AddScoped<IStripeClient>(serviceProvider => serviceProvider.GetRequiredKeyedService<IStripeClient>(clientName));
+        }
+        
+        return stripeClientBuilder;
+    }
+
+    private static IServiceCollection AddStripeServiceProvider(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSingleton<IStripeServiceProvider, StripeServiceProvider>();
+        return serviceCollection;
     }
 }
-
-internal sealed class StripeClientBuilder(IHttpClientBuilder httpClientBuilder) : IStripeClientBuilder
-{
-    public string Name => httpClientBuilder.Name;
-    public IServiceCollection Services => httpClientBuilder.Services;
-}
-
-public interface IStripeClientBuilder: IHttpClientBuilder { }
