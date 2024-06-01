@@ -8,26 +8,41 @@ namespace Stripe.Extensions.AspNetCore;
 
 public static class StripeAppBuilderExtensions
 {
-    public static IEndpointRouteBuilder MapStripeWebhookHandler<T>(this IEndpointRouteBuilder endpointRouteBuilder)
+    public static IEndpointRouteBuilder MapStripeWebhookHandler<T>(this IEndpointRouteBuilder endpointRouteBuilder,
+        string namedConfiguration = StripeOptions.DefaultClientConfigurationSectionName)
         where T : StripeWebhookHandler
     {
-        return endpointRouteBuilder.MapStripeWebhookHandler<T>("/stripe/webhook");
+        if (namedConfiguration == null)
+            throw new ArgumentNullException(nameof(namedConfiguration));
+
+        return endpointRouteBuilder.MapStripeWebhookHandler<T>("/stripe/webhook", namedConfiguration);
     }
 
-    public static IEndpointRouteBuilder MapStripeWebhookHandler<T>(this IEndpointRouteBuilder endpointRouteBuilder, string pattern)
-        where T: StripeWebhookHandler
+    public static IEndpointRouteBuilder MapStripeWebhookHandler<T>(this IEndpointRouteBuilder endpointRouteBuilder,
+        string pattern, string namedConfiguration)
+        where T : StripeWebhookHandler
     {
-        var options = endpointRouteBuilder.ServiceProvider.GetService<IOptions<StripeOptions>>();
+        if (pattern == null)
+            throw new ArgumentNullException(nameof(pattern));
+
+        if (namedConfiguration == null)
+            throw new ArgumentNullException(nameof(namedConfiguration));
+
+        endpointRouteBuilder.ServiceProvider.GetKeyedService<IStripeClient>(namedConfiguration);
+        var options = endpointRouteBuilder.ServiceProvider.GetRequiredService<IOptionsSnapshot<StripeOptions>>()
+            .Get(namedConfiguration);
+        
         if (options == null)
         {
-            throw new InvalidOperationException("Stripe services were not registered. Please call services.AddStripe()");
+            throw new InvalidOperationException(
+                $"Stripe services for {namedConfiguration} were not registered. Please call services.AddStripe()");
         }
 
-        var handlerFactory = ActivatorUtilities.CreateFactory(typeof(T), new[]{typeof(StripeWebhookContext)});
+        var handlerFactory = ActivatorUtilities.CreateFactory(typeof(T), [typeof(StripeWebhookContext)]);
         endpointRouteBuilder.MapPost(pattern, async context =>
         {
-            var stripeWebhookContext = new StripeWebhookContext(context, options.Value);
-            var handler = (T)handlerFactory(context.RequestServices, new object?[]{stripeWebhookContext} );
+            var stripeWebhookContext = new StripeWebhookContext(context, options);
+            var handler = (T)handlerFactory(context.RequestServices, [stripeWebhookContext]);
             await handler.ExecuteAsync();
         });
 
