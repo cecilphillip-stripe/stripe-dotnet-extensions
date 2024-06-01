@@ -18,9 +18,9 @@ dotnet add package Stripe.Extensions.AspNetCore
 
 ## Usage
 
-Use the `IServiceCollection.AddStripe()` extension method to register Stripe services in Dependency Injection container:
+Use the `AddStripe()` extension method to register Stripe services in Dependency Injection container:
 
-```C#
+```csharp
 // Startup-based apps
 public void ConfigureServices(IServiceCollection services)
 {
@@ -31,26 +31,21 @@ public void ConfigureServices(IServiceCollection services)
 builder.Services.AddStripe();
 ```
 
-Now Stripe services can be injected into application components.
+The `AddStripe()` extension also supports registering named Stripe clients.
 
-```C#
-public class HomeController : Controller
-{
-    private readonly ProductService _productService;
-
-    public HomeController(ProductService productService)
-    {
-        _productService = productService;
-    }
-}
+```csharp
+builder.Services.AddStripe(); // default client
+builder.Services.AddStripe("client1"); // client1
+builder.Services.AddStripe("client2"); // client2
 ```
 
 ### Configuration
 
 The Stripe [API keys](https://docs.stripe.com/keys#obtain-api-keys) need to be configured before calls can be made using the SDK.
-The extension packages will look for a `Stripe` configuration section by default.
+By default, the extension packages will look for a `Stripe` configuration section when calling `AddStripe()` 
+without a client name. For named clients, the configuration section should match the client name.
 
-
+To configure the default client: 
 ```json
 {
   "Stripe": {
@@ -59,20 +54,98 @@ The extension packages will look for a `Stripe` configuration section by default
   }
 }
 ```
-
-There is also the option of updating the settings directly via a `.AddStripe` call
-
-```C#
-builder.Services.AddStripe(o => {
-    o.SecretKey = "<secret key>";
-    o.WebhookSecret = "<webhook secret>";
-});
+To configure a client named `client1`:
+```json
+{
+  "client1": {
+    "SecretKey" : "<secret key>",
+    "WebhookSecret": "<webhook secret>"
+  }
+}
 ```
 
-or by passing an instance of `IConfiguration`. 
+Configuration can also be attached to each registered client by using the `WithOptions` method.
+It can accept an instance of `StripeOptions` or a configuration delegate.
 
-```C#
-builder.Services.AddStripe(configuration.GetSection("CustomSection"));
+```csharp
+// using StripeOptions
+builder.Services.AddStripe()
+    .WithOptions(new StripeOptions {
+        SecretKey = "<secret key>",
+        WebhookSecret = "<webhook secret>"
+    });
+
+// using configuration delegate
+builder.Services.AddStripe("client1")
+    .WithOptions( options => { 
+        options.SecretKey = "<secret key>";
+        options.WebhookSecret = "<webhook secret>";
+    });
+```
+> If both configuration options are used, `WithOptions` will take precedence and override the values
+provided in the configuration section.
+
+### Registering services
+`AddStripe` registers the following services in the DI container:
+- `IStripeClient` - the main Stripe client used to make API calls.
+- `IStripeServiceProvider` - a service provider that can be used to resolve Stripe services.
+
+Retrieving the default client registered with `AddStripe()`: 
+```csharp
+public class HomeController : Controller
+{
+    private readonly IStripeClient _stripeClient;
+
+    public HomeController(IStripeClient stripeClient)
+    {
+        _stripeClient = stripeClient;
+    }
+    
+    public async Task<IActionResult> Index()
+    {
+        var customerService = new CustomerService(_stripeClient);
+        var customer = await customerService.GetAsync("cus_NffrFeUfNV2Hib");        
+        ...
+        return View();
+    } 
+}
+```
+
+Retrieving a client registered with `AddStripe("client1")`:
+```csharp
+public class HomeController : Controller
+{
+    private readonly IStripeClient _stripeClient;
+
+    public HomeController([FromKeyedServices("client1")]IStripeClient stripeClient)
+    {
+        _stripeClient = stripeClient;
+    }
+}
+```
+
+The `IStripeServiceProvider` service is provided as a convenience helper to resolve Stripe named services. 
+```csharp
+public class HomeController : Controller
+{
+    private readonly IStripeServiceProvider _stripeServiceProvider;
+
+    public HomeController(IStripeServiceProvider stripeServiceProvider)
+    {
+        _stripeServiceProvider = stripeServiceProvider;
+    }
+    
+    public async Task<IActionResult> Index()
+    {
+        // default client
+        var customerService = _stripeServiceProvider.GetService<CustomerService>();
+        
+        // named client
+        var nameCustomerService = _stripeServiceProvider.GetService<CustomerService>("client1"); 
+        ...
+        return View();
+    } 
+}
 ```
 
 ### Webhook handling
@@ -82,14 +155,14 @@ All that's needed is to override the appropriate events of the handler class.
 
 First, define a handler class that inherits from [StripeWebhookHandler](./src/Stripe.Extensions.AspNetCore/StripeWebhookHandler.cs):
 
-```C#
+```csharp
 public class MyWebhookHandler: StripeWebhookHandler {}
 ```
 
 The `StripeWebhookHandler` class defines virtual methods for all known webhook events.
 To handle an event override the corresponding `On*Async` method.
 
-```C#
+```csharp
 public class MyWebhookHandler: StripeWebhookHandler
 {
     public override Task OnCustomerCreatedAsync(Event e)
@@ -103,7 +176,7 @@ public class MyWebhookHandler: StripeWebhookHandler
 The last step is to register the webhook handler with ASP.NET Core routing by calling `MapStripeWebhookHandler`.
 > NOTE: the Stripe Webhook handler uses ASP.NET Core routing, so adding a call to `app.UseRouting()` might be required.
 
-```C#
+```csharp
 // Startup-based apps
 public void Configure(IApplicationBuilder app)
 {
@@ -119,7 +192,7 @@ app.MapStripeWebhookHandler<MyWebhookHandler>();
 
 The `StripeWebhookHandler` also supports constructor dependency injection, so Stripe or other services can be injected by defining them as constructor parameters.
 
-```C#
+```csharp
 public class MyWebhookHandler: StripeWebhookHandler
 {
     private readonly CustomerService _customerService;
@@ -144,7 +217,7 @@ public class MyWebhookHandler: StripeWebhookHandler
 The `StripeWebhookHandler` also simplifies unit testing of webhook handling logic.
 For example, here is how a unit-test might be written to test the logic of the handler from the previous section:
 
-```C#
+```csharp
 [Fact]
 public async Task UpdatesCustomerOnCreation()
 {
