@@ -61,7 +61,6 @@ public abstract partial class StripeWebhookHandler
             ["enum"]!.AsArray().Select(e => e!.ToString());
 
         return events;
-        //return Array.Empty<string>();
     }
 
     private string GenerateEventHandlerCode()
@@ -76,26 +75,26 @@ public abstract partial class StripeWebhookHandler
                 .Replace("_", string.Empty)
                 .Replace(".", string.Empty) + "Async";
 
-            return new { MethodName =  methodName, EventName = e};
+            return new { MethodName = methodName, EventName = e };
         }).ToArray();
 
         foreach (var method in methods)
         {
-            builder.AppendLine($@"    // Fired when the {method.EventName} event is received.");
-            builder.AppendLine($@"    public virtual Task {method.MethodName}(Event e) => UnhandledEventAsync(e);");
+            builder.AppendLine($"    // Fired when the {method.EventName} event is received.");
+            builder.AppendLine($"    public virtual Task {method.MethodName}(Event e) => UnhandledEventAsync(e);");
             builder.AppendLine();
         }
 
-        builder.AppendLine($@"    protected virtual Task ExecuteAsync(Event e) => e.Type switch");
-        builder.AppendLine($@"    {{");
+        builder.AppendLine("    protected virtual Task ExecuteAsync(Event e) => e.Type switch");
+        builder.AppendLine("    {");
         foreach (var method in methods)
         {
             builder.AppendLine($@"        ""{method.EventName}"" => {method.MethodName}(e),");
         }
-        builder.AppendLine($@"        _ => UnknownEventAsync(e),");
-        builder.AppendLine($@"    }};");
+
+        builder.AppendLine("        _ => UnknownEventAsync(e),");
+        builder.AppendLine("    };");
 
         return builder.ToString();
     }
-
 }

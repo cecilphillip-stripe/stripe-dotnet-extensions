@@ -21,7 +21,9 @@ internal sealed class StripeClientBuilder(IHttpClientBuilder httpClientBuilder) 
 
     public StripeClient Build(IServiceProvider serviceProvider)
     {
-        var stripeOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<StripeOptions>>().Get(Name);
+        using var scope = serviceProvider.CreateScope(); //IOptionsSnapshot requires scope
+        
+        var stripeOptions = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<StripeOptions>>().Get(Name);
         if(Options is not null)
         {
             stripeOptions = Options;

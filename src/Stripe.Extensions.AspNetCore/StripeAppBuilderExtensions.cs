@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -28,19 +29,19 @@ public static class StripeAppBuilderExtensions
         if (namedConfiguration == null)
             throw new ArgumentNullException(nameof(namedConfiguration));
 
-        endpointRouteBuilder.ServiceProvider.GetKeyedService<IStripeClient>(namedConfiguration);
-        var options = endpointRouteBuilder.ServiceProvider.GetRequiredService<IOptionsSnapshot<StripeOptions>>()
-            .Get(namedConfiguration);
-        
-        if (options == null)
-        {
-            throw new InvalidOperationException(
-                $"Stripe services for {namedConfiguration} were not registered. Please call services.AddStripe()");
-        }
-
-        var handlerFactory = ActivatorUtilities.CreateFactory(typeof(T), [typeof(StripeWebhookContext)]);
         endpointRouteBuilder.MapPost(pattern, async context =>
         {
+            var handlerFactory = ActivatorUtilities.CreateFactory(typeof(T), [typeof(StripeWebhookContext)]);
+            context.RequestServices.GetKeyedService<IStripeClient>(namedConfiguration);
+            var options = context.RequestServices.GetRequiredService<IOptionsSnapshot<StripeOptions>>()
+                .Get(namedConfiguration);
+
+            if (options == null)
+            {
+                throw new InvalidOperationException(
+                    $"Stripe services for {namedConfiguration} were not registered. Please call services.AddStripe()");
+            }
+
             var stripeWebhookContext = new StripeWebhookContext(context, options);
             var handler = (T)handlerFactory(context.RequestServices, [stripeWebhookContext]);
             await handler.ExecuteAsync();

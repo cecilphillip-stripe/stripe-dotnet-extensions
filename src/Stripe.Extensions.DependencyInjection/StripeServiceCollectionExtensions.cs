@@ -23,10 +23,10 @@ public static partial class StripeServiceCollectionExtensions
             .Configure(ConfigureStripeOptions)
             .Configure<IServiceProvider>((options, provider) =>
                 BindOptionsConfiguration(clientName, options, provider));
-        
-        AddStripeServiceProvider(services);
-        return services.RegisterClientServices(clientName);
-        
+
+        return services.AddStripeServiceProvider()
+            .RegisterClientServices(clientName);
+
         static void ConfigureStripeOptions(StripeOptions options)
         {
             var asm = Assembly.GetAssembly(typeof(StripeOptions)).GetName();
@@ -46,19 +46,21 @@ public static partial class StripeServiceCollectionExtensions
             configSection.Bind(options);
         }
     }
-    
+
     private static IStripeClientBuilder RegisterClientServices(this IServiceCollection services, string clientName)
     {
         var httpClientBuilder = services.AddHttpClient(clientName);
-        var stripeClientBuilder=  new StripeClientBuilder(httpClientBuilder);
-      
-        services.AddKeyedScoped<IStripeClient, StripeClient>(clientName, (serviceProvider, _) => stripeClientBuilder.Build(serviceProvider));      
-        
+        var stripeClientBuilder = new StripeClientBuilder(httpClientBuilder);
+
+        services.AddKeyedScoped<IStripeClient, StripeClient>(clientName,
+            (serviceProvider, _) => stripeClientBuilder.Build(serviceProvider));
+
         if (clientName == DefaultClientConfigurationSectionName)
         {
-            services.AddScoped<IStripeClient>(serviceProvider => serviceProvider.GetRequiredKeyedService<IStripeClient>(clientName));
+            services.AddScoped<IStripeClient>(serviceProvider =>
+                serviceProvider.GetRequiredKeyedService<IStripeClient>(clientName));
         }
-        
+
         return stripeClientBuilder;
     }
 
