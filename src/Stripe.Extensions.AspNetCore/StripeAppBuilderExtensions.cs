@@ -32,7 +32,7 @@ public static class StripeAppBuilderExtensions
         endpointRouteBuilder.MapPost(pattern, async context =>
         {
             var handlerFactory = ActivatorUtilities.CreateFactory(typeof(T), [typeof(StripeWebhookContext)]);
-            context.RequestServices.GetKeyedService<IStripeClient>(namedConfiguration);
+            var stripeClient = context.RequestServices.GetRequiredKeyedService<IStripeClient>(namedConfiguration);
             var options = context.RequestServices.GetRequiredService<IOptionsSnapshot<StripeOptions>>()
                 .Get(namedConfiguration);
 
@@ -42,7 +42,7 @@ public static class StripeAppBuilderExtensions
                     $"Stripe services for {namedConfiguration} were not registered. Please call services.AddStripe()");
             }
 
-            var stripeWebhookContext = new StripeWebhookContext(context, options);
+            var stripeWebhookContext = new StripeWebhookContext(context, options, stripeClient);
             var handler = (T)handlerFactory(context.RequestServices, [stripeWebhookContext]);
             await handler.ExecuteAsync();
         });

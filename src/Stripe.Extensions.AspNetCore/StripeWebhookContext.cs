@@ -3,14 +3,9 @@ using Stripe.Extensions.DependencyInjection;
 
 namespace Stripe.Extensions.AspNetCore;
 
-public class StripeWebhookContext
+public class StripeWebhookContext(HttpContext httpContext, StripeOptions stripeOptions, IStripeClient stripeClient)
 {
-    public HttpContext HttpContext { get; }
-    public StripeOptions StripeOptions { get; }
-
-    public StripeWebhookContext(HttpContext httpContext, StripeOptions stripeOptions)
-    {
-        HttpContext = httpContext;
-        StripeOptions = stripeOptions;
-    }
+    public HttpContext HttpContext { get; } = httpContext;
+    public StripeOptions StripeOptions { get; } = stripeOptions;
+    public IStripeClient? Client { get; } = stripeClient;
 }
