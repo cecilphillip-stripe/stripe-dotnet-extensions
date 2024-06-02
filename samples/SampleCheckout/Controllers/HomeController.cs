@@ -11,10 +11,10 @@ public class HomeController : Controller
     private readonly ProductService _productService;
     private readonly ILogger<HomeController> _logger;
 
-    public HomeController(IStripeClient stripeClient, ProductService productService, ILogger<HomeController> logger)
+    public HomeController(IStripeClient stripeClient, ILogger<HomeController> logger)
     {
         _stripeClient = stripeClient;
-        _productService = productService;
+        _productService = new ProductService(stripeClient);
         _logger = logger;
     }
 

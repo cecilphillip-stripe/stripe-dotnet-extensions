@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Http.Resilience;
 using Stripe;
 using Stripe.Extensions.AspNetCore;
+using Stripe.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +20,10 @@ app.Run();
 
 public class MyWebhookHandler: StripeWebhookHandler
 {
-    private readonly CustomerService _customerService;
-    public MyWebhookHandler(CustomerService customerService, StripeWebhookContext context): base(context)
+    private readonly CustomerService? _customerService;
+    public MyWebhookHandler(IStripeServiceProvider stripeServiceProvider, StripeWebhookContext context): base(context)
     {
-        _customerService = customerService;
+        _customerService = stripeServiceProvider.GetService<CustomerService>(Context.StripeOptions.ClientName);
     }
 
     public override async Task OnCustomerCreatedAsync(Event e)
