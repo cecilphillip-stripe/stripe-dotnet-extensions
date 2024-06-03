@@ -29,8 +29,7 @@ public abstract partial class StripeWebhookHandler
                 "You can set it using Stripe:WebhookSecret configuration section or " +
                 "by passing the value to .AddStripe(o => o.WebhookSecret = \"whse_123\") call");
 
-            WebhookSecretValidationFailed(Logger, "Webhook Secret Validation Failed!",
-                nameof(ExecuteAsync), ex);
+            Logger.WebhookSecretValidationFailed("Webhook Secret Validation Failed!", ex);
             throw ex;
         }
 
@@ -50,7 +49,7 @@ public abstract partial class StripeWebhookHandler
         }
         catch (Exception e)
         {
-            EventParsingError(Logger, e);
+            Logger.EventParsingError( e);
             response.StatusCode = 400;
             return;
         }
@@ -61,7 +60,7 @@ public abstract partial class StripeWebhookHandler
         }
         catch (Exception e)
         {
-            ExecutionError(Logger, stripeEvent.Type, e);
+            Logger.ExecutionError( stripeEvent.Type, e);
             response.StatusCode = 500;
         }
     }
@@ -69,41 +68,49 @@ public abstract partial class StripeWebhookHandler
     private Task UnhandledEventAsync(Event e,
         [CallerMemberName] string? handlerMethod = null)
     {
-        UnhandledEvent(Logger, e.Type, handlerMethod ?? "<unknown>", null);
+        Logger.UnhandledEvent( e.Type, handlerMethod ?? "<unknown>", null);
         return Task.CompletedTask;
     }
 
     protected virtual Task UnknownEventAsync(Event e)
     {
-        UnknownEvent(Logger, e.Type, null);
+       Logger. UnknownEvent( e.Type, null);
         return Task.CompletedTask;
     }
+}
 
-    private static Action<ILogger, Exception> EventParsingError = LoggerMessage.Define(
-        LogLevel.Warning,
-        1,
-        "Exception occured while parsing the Stripe WebHook event payload.");
-
-    private static Action<ILogger, string, Exception> ExecutionError = LoggerMessage.Define<string>(
-        LogLevel.Warning,
-        2,
-        "Exception occured while executing event handler for {event_type}");
-
-    private static Action<ILogger, string, Exception?> UnknownEvent = LoggerMessage.Define<string>(
-        LogLevel.Warning,
-        3,
-        "Event type {event_type} is not supported by this version of the library, consider upgrading." +
-        "You can override the UnknownEventAsync method to suppress this log message.");
-
-    private static Action<ILogger, string, string, Exception?> UnhandledEvent =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Warning,
-            4,
-            "Event type {event_type} does not have a handler. Override the {method_name} method to handle the event.");
-
-    private static Action<ILogger, string, string, Exception?> WebhookSecretValidationFailed =
-        LoggerMessage.Define<string, string>(
-            LogLevel.Error,
-            5,
-            "Event type {event_type} does not have a handler. Override the {method_name} method to handle the event.");
+internal static partial class StripeWebhookHandlerLogger
+{
+    [LoggerMessage(
+        EventId = 1,
+        Level = LogLevel.Warning,
+        Message = "Exception occured while parsing the Stripe WebHook event payload.")]
+    public static partial void EventParsingError(this ILogger logger, Exception ex);
+    
+    [LoggerMessage(
+        EventId = 2,
+        Level = LogLevel.Warning,
+        Message =  "Exception occured while executing event handler for {event_type}")]
+    public static partial void ExecutionError(this ILogger logger, string eventType, Exception? ex);
+    
+    [LoggerMessage(
+        EventId = 3,
+        Level = LogLevel.Warning,
+        Message =  "Event type {EventType} is not supported by this version of the library, consider upgrading." +
+                   "You can override the UnknownEventAsync method to suppress this log message."
+        )]
+    public static partial void UnknownEvent(this ILogger logger, string eventType, Exception? ex);
+    
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        EventId = 4,
+        Message = "Event type {EventType} does not have a handler. Override the {MethodName} method to handle the event.")]
+    public static partial void UnhandledEvent(this ILogger logger, string eventType, string methodName, Exception? ex);
+    
+    [LoggerMessage(
+        EventId = 5,
+        Level = LogLevel.Error,
+    Message = "Webhook secret validation failed for event type {EventType}.")]
+    public static partial void WebhookSecretValidationFailed(this ILogger logger, string eventType, Exception ex);
+   
 }
