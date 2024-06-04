@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Http.Resilience;
 using Stripe;
 using Stripe.Extensions.AspNetCore;
 using Stripe.Extensions.DependencyInjection;
@@ -6,7 +5,10 @@ using Stripe.Extensions.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddStripe()
+builder.Services.AddStripe(configureOptions: opts =>
+    {
+        opts.SecretKey = opts.WebhookSecret = "ok_test_123";
+    })
     .AddStandardResilienceHandler();
 
 var app = builder.Build();
@@ -29,7 +31,7 @@ public class MyWebhookHandler: StripeWebhookHandler
     public override async Task OnCustomerCreatedAsync(Event e)
     {
         var customer = (e.Data.Object as Customer)!;
-        await _customerService.UpdateAsync(customer.Id, new CustomerUpdateOptions()
+        await _customerService!.UpdateAsync(customer.Id, new CustomerUpdateOptions()
         {
             Description = "New customer"
         });

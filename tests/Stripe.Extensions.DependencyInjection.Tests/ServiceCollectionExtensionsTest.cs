@@ -36,8 +36,8 @@ public class ServiceCollectionExtensionsTest
 
         var collection = new ServiceCollection();
 
-        collection.AddStripe(clientOneKey).WithOptions(options => options.SecretKey = clientOneKey);
-        collection.AddStripe(otherStripe).WithOptions(options => options.SecretKey = otherStripe);
+        collection.AddStripe(clientOneKey, options => options.SecretKey = clientOneKey);
+        collection.AddStripe(otherStripe,options => options.SecretKey = otherStripe);
 
         var provider = collection.BuildServiceProvider();
         var stripeServiceProvider = provider.GetRequiredService<IStripeServiceProvider>();
@@ -53,7 +53,7 @@ public class ServiceCollectionExtensionsTest
     {
         var collection = new ServiceCollection();
 
-        collection.AddStripe().WithOptions(opts => opts.SecretKey = "SecretKey");
+        collection.AddStripe(configureOptions: opts => opts.SecretKey = "SecretKey");
 
         var provider = collection.BuildServiceProvider();
         var stripeServiceProvider = provider.GetRequiredService<IStripeServiceProvider>();
@@ -125,8 +125,8 @@ public class ServiceCollectionExtensionsTest
 
         var collection = new ServiceCollection();
 
-        collection.AddStripe(clientOneKey).WithOptions(options => options.SecretKey = clientOneKey);
-        collection.AddStripe(otherStripe).WithOptions(options => options.SecretKey = otherStripe);
+        collection.AddStripe(clientOneKey, options => options.SecretKey = clientOneKey);
+        collection.AddStripe(otherStripe, options => options.SecretKey = otherStripe);
 
         var provider = collection.BuildServiceProvider();
 
@@ -152,9 +152,9 @@ public class ServiceCollectionExtensionsTest
                 { $"{clientOneKey}:SecretKey", "one" }
             }).Build());
         
-        collection.AddStripe(clientOneKey).WithOptions(new StripeOptions
+        collection.AddStripe(clientOneKey, opts =>
         {
-            SecretKey = clientOneKey
+            opts.SecretKey = clientOneKey;
         });
 
         var provider = collection.BuildServiceProvider();
@@ -214,7 +214,7 @@ public class ServiceCollectionExtensionsTest
                 { "Stripe:SecretKey", "MyKey" }
             }).Build());
 
-        collection.AddStripe().WithOptions(opts => opts.SecretKey = "AnotherKey");
+        collection.AddStripe(configureOptions: opts => opts.SecretKey = "AnotherKey");
 
         var provider = collection.BuildServiceProvider();
         var stripeServiceProvider = provider.GetRequiredService<IStripeServiceProvider>();
@@ -235,12 +235,5 @@ public class ServiceCollectionExtensionsTest
     {
         var collection = new ServiceCollection();
         Assert.Throws<ArgumentNullException>(() => collection.AddStripe(null!));
-    }
-    
-    [Fact]
-    public void WithOptionsThrowsExceptionIfActionNull()
-    {
-        var collection = new ServiceCollection();
-        Assert.Throws<ArgumentNullException>(() => collection.AddStripe().WithOptions((Action<StripeOptions>)null!));
     }
 }

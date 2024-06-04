@@ -28,7 +28,7 @@ public static class StripeAppBuilderExtensions
 
         if (namedConfiguration == null)
             throw new ArgumentNullException(nameof(namedConfiguration));
-
+   
         endpointRouteBuilder.MapPost(pattern, async context =>
         {
             var handlerFactory = ActivatorUtilities.CreateFactory(typeof(T), [typeof(StripeWebhookContext)]);

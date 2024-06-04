@@ -7,10 +7,10 @@ using static Stripe.Extensions.DependencyInjection.StripeOptions;
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static partial class StripeServiceCollectionExtensions
+public static class StripeServiceCollectionExtensions
 {
     public static IStripeClientBuilder AddStripe(this IServiceCollection services,
-        string clientName = DefaultClientConfigurationSectionName)
+        string clientName = DefaultClientConfigurationSectionName, Action<StripeOptions>? configureOptions = null)
     {
         if (services is null)
             throw new ArgumentNullException(nameof(services));
@@ -22,7 +22,8 @@ public static partial class StripeServiceCollectionExtensions
         services.AddOptions<StripeOptions>(clientName)
             .Configure(ConfigureStripeOptions)
             .Configure<IServiceProvider>((options, provider) =>
-                BindOptionsConfiguration(clientName, options, provider));
+                BindOptionsConfiguration(clientName, options, provider))
+            .PostConfigure(opts => configureOptions?.Invoke(opts));
 
         return services.AddStripeServiceProvider()
             .RegisterClientServices(clientName);
@@ -43,7 +44,9 @@ public static partial class StripeServiceCollectionExtensions
             var configSection = configuration?.GetSection(clientName);
 
             if (configSection == null) return;
+
             configSection.Bind(options);
+            options.ClientName = clientName;
         }
     }
 

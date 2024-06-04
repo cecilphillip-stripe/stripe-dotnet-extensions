@@ -18,11 +18,11 @@ public class WebhookHandlerTests
     private readonly string _secret = "secret_key";
     private readonly List<Event> _invocations = new();
 
-    public IWebHostBuilder BuildHostBuilder(Action<StripeOptions>? configureOptions = null)
+    public IWebHostBuilder BuildHostBuilder(string clientName = StripeOptions.DefaultClientConfigurationSectionName, Action<StripeOptions>? configureOptions = null)
     {
         return new WebHostBuilder()
             .ConfigureServices(s => s
-                .AddStripe().WithOptions(configureOptions ?? (_ => { }))
+                .AddStripe(clientName, configureOptions)
                 .Services
                 .AddRouting()
                 .AddLogging(l => l.AddTest())
@@ -35,19 +35,16 @@ public class WebhookHandlerTests
     [Fact]
     public async Task LogsFailedEventParsing()
     {
-        ITestLoggerSink testSink;
-
-        using (TestServer testServer = new TestServer(BuildHostBuilder(opts =>
-               {
-                   opts.SecretKey = _secret;
-                   opts.WebhookSecret = _secret;
-               })))
+        using var testServer = new TestServer(BuildHostBuilder(configureOptions: opts =>
         {
-            testSink = testServer.Host.Services.GetRequiredService<ITestLoggerSink>();
-            using HttpClient httpClient = testServer.CreateClient();
-            var response = await httpClient.PostAsync("/stripe/webhook", new StringContent("{}"));
-            Assert.Equal((HttpStatusCode)400, response.StatusCode);
-        }
+            opts.SecretKey = _secret;
+            opts.WebhookSecret = _secret;
+        }));
+        
+        var testSink = testServer.Host.Services.GetRequiredService<ITestLoggerSink>();
+        using var httpClient = testServer.CreateClient();
+        var response = await httpClient.PostAsync("/stripe/webhook", new StringContent("{}"));
+        Assert.Equal((HttpStatusCode)400, response.StatusCode);
 
         Assert.Contains(testSink.LogEntries, e =>
             e.LogLevel == LogLevel.Warning &&
@@ -57,7 +54,7 @@ public class WebhookHandlerTests
     [Fact]
     public async Task ThrowsUsefulErrorMessageIfWebhookSecretNotSet()
     {
-        using (TestServer testServer = new TestServer(BuildHostBuilder(opts =>
+        using (TestServer testServer = new TestServer(BuildHostBuilder(configureOptions: opts =>
                {
                    opts.SecretKey = _secret;
                    opts.WebhookSecret = null!;
@@ -75,7 +72,7 @@ public class WebhookHandlerTests
     {
         ITestLoggerSink testSink;
 
-        using (TestServer testServer = new TestServer(BuildHostBuilder(opts =>
+        using (TestServer testServer = new TestServer(BuildHostBuilder(configureOptions: opts =>
                {
                    opts.SecretKey = _secret;
                    opts.WebhookSecret = _secret;
@@ -98,7 +95,7 @@ public class WebhookHandlerTests
     {
         ITestLoggerSink testSink;
 
-        using (TestServer testServer = new TestServer(BuildHostBuilder(opts =>
+        using (TestServer testServer = new TestServer(BuildHostBuilder(configureOptions: opts =>
                {
                    opts.SecretKey = _secret;
                    opts.WebhookSecret = _secret;
@@ -121,7 +118,7 @@ public class WebhookHandlerTests
     {
         ITestLoggerSink testSink;
 
-        using (TestServer testServer = new TestServer(BuildHostBuilder(opts =>
+        using (TestServer testServer = new TestServer(BuildHostBuilder(configureOptions: opts =>
                {
                    opts.SecretKey = _secret;
                    opts.WebhookSecret = _secret;
@@ -144,7 +141,7 @@ public class WebhookHandlerTests
     {
         ITestLoggerSink testSink;
 
-        using (TestServer testServer = new TestServer(BuildHostBuilder(opts =>
+        using (TestServer testServer = new TestServer(BuildHostBuilder(configureOptions: opts =>
                {
                    opts.SecretKey = _secret;
                    opts.WebhookSecret = _secret;
@@ -166,7 +163,7 @@ public class WebhookHandlerTests
         ITestLoggerSink testSink;
 
         using (TestServer testServer = new TestServer(
-                   BuildHostBuilder(options =>
+                   BuildHostBuilder(configureOptions: options =>
                    {
                        options.SecretKey = _secret;
                        options.WebhookSecret = _secret;
@@ -188,7 +185,7 @@ public class WebhookHandlerTests
     {
         ITestLoggerSink testSink;
 
-        using (TestServer testServer = new TestServer(BuildHostBuilder(options =>
+        using (TestServer testServer = new TestServer(BuildHostBuilder(configureOptions: options =>
                {
                    options.SecretKey = _secret;
                    options.WebhookSecret = _secret;
