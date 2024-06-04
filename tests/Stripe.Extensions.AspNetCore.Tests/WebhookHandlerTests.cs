@@ -7,11 +7,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Stripe.Extensions.AspNetCore;
 using Stripe.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Stripe.AspNetCore.Tests;
+namespace Stripe.Extensions.AspNetCore.Tests;
 
 public class WebhookHandlerTests
 {

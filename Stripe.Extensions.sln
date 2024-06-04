@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.Extensions.AspNetCor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A01CFCC5-52FD-4C50-AF65-C9C66D10BC8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.AspNetCore.Tests", "tests\Stripe.AspNetCore.Tests\Stripe.AspNetCore.Tests.csproj", "{43A5C314-149B-4434-9D3C-5A0650CE4E9C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.Extensions.AspNetCore.Tests", "tests\Stripe.Extensions.AspNetCore.Tests\Stripe.Extensions.AspNetCore.Tests.csproj", "{43A5C314-149B-4434-9D3C-5A0650CE4E9C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stripe.Extensions.DependencyInjection.Tests", "tests\Stripe.Extensions.DependencyInjection.Tests\Stripe.Extensions.DependencyInjection.Tests.csproj", "{66DDC5B6-42B8-4DE6-BE7B-6A021C135184}"
 EndProject
