@@ -90,7 +90,7 @@ internal static partial class StripeWebhookHandlerLogger
     [LoggerMessage(
         EventId = 2,
         Level = LogLevel.Warning,
-        Message =  "Exception occured while executing event handler for {event_type}")]
+        Message =  "Exception occured while executing event handler for {EventType}")]
     public static partial void ExecutionError(this ILogger logger, string eventType, Exception? ex);
     
     [LoggerMessage(
