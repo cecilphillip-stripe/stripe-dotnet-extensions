@@ -9,6 +9,8 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class StripeServiceCollectionExtensions
 {
+    private static readonly AssemblyName AsmName = typeof(StripeServiceCollectionExtensions).Assembly.GetName();
+    
     public static IStripeClientBuilder AddStripe(this IServiceCollection services,
         string clientName = DefaultClientConfigurationSectionName, Action<StripeOptions>? configureOptions = null)
     {
@@ -19,31 +21,28 @@ public static class StripeServiceCollectionExtensions
             throw new ArgumentNullException(nameof(clientName));
 
         // Register the named stripe client with configuration section
-        services.AddOptions<StripeOptions>(clientName)
+       services.AddOptions<StripeOptions>(clientName)
             .Configure(ConfigureStripeOptions)
             .Configure<IServiceProvider>((options, provider) =>
                 BindOptionsConfiguration(clientName, options, provider))
             .PostConfigure(opts => configureOptions?.Invoke(opts));
 
-        return services.AddStripeServiceProvider()
+        return services
             .RegisterClientServices(clientName);
 
         static void ConfigureStripeOptions(StripeOptions options)
         {
-            var asm = Assembly.GetAssembly(typeof(StripeOptions)).GetName();
             options.AppInfo ??= new AppInfo
             {
-                Name = asm.Name,
-                Version = asm.Version?.ToString()
+                Name = AsmName.Name,
+                Version = AsmName.Version?.ToString()
             };
         }
 
         static void BindOptionsConfiguration(string clientName, StripeOptions options, IServiceProvider provider)
         {
             var configuration = provider.GetService<IConfiguration>();
-            var configSection = configuration?.GetSection(clientName);
-
-            if (configSection == null) return;
+            var configSection = configuration!.GetSection($"Stripe:{clientName}");
 
             configSection.Bind(options);
             options.ClientName = clientName;
@@ -52,6 +51,8 @@ public static class StripeServiceCollectionExtensions
 
     private static IStripeClientBuilder RegisterClientServices(this IServiceCollection services, string clientName)
     {
+        services.AddSingleton<IStripeServiceProvider, StripeServiceProvider>();
+        
         var httpClientBuilder = services.AddHttpClient(clientName);
         var stripeClientBuilder = new StripeClientBuilder(httpClientBuilder);
 
@@ -65,11 +66,5 @@ public static class StripeServiceCollectionExtensions
         }
 
         return stripeClientBuilder;
-    }
-
-    private static IServiceCollection AddStripeServiceProvider(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddSingleton<IStripeServiceProvider, StripeServiceProvider>();
-        return serviceCollection;
     }
 }

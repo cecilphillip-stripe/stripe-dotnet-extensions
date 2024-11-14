@@ -5,8 +5,6 @@ namespace Stripe.Extensions.DependencyInjection;
 
 public interface IStripeClientBuilder : IHttpClientBuilder
 {
-    StripeOptions? Options { get; set; }
-
     StripeClient Build(IServiceProvider serviceProvider);
 }
 
@@ -15,18 +13,11 @@ internal sealed class StripeClientBuilder(IHttpClientBuilder httpClientBuilder) 
     public string Name => httpClientBuilder.Name;
     public IServiceCollection Services => httpClientBuilder.Services;
 
-    public StripeOptions? Options { get; set; }
-    
-
     public StripeClient Build(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope(); //IOptionsSnapshot requires scope
         
         var stripeOptions = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<StripeOptions>>().Get(Name);
-        if(Options is not null)
-        {
-            stripeOptions = Options;
-        }
         
         if (string.IsNullOrEmpty(stripeOptions.SecretKey))
         {
@@ -42,6 +33,7 @@ internal sealed class StripeClientBuilder(IHttpClientBuilder httpClientBuilder) 
             appInfo: stripeOptions.AppInfo,
             enableTelemetry: stripeOptions.EnableTelemetry);
 
-        return new StripeClient(apiKey: stripeOptions.SecretKey, httpClient: systemHttpClient);
+        stripeOptions.HttpClient = systemHttpClient;
+        return new StripeClient(stripeOptions);
     }
 }
