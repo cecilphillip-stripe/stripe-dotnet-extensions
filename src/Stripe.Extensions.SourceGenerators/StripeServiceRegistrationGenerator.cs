@@ -6,6 +6,7 @@ using MrMeeseeks.SourceGeneratorUtility;
 namespace Stripe.Extensions.SourceGenerators;
 
 [Generator]
+[Obsolete("This generator is no longer needed")]
 public class StripeServiceRegistrationGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
