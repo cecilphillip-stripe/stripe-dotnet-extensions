@@ -3,7 +3,7 @@
   "profiles": {
     "Stripe.Extensions.AspNetCore.SourceGenerators": {
       "commandName": "DebugRoslynComponent",
-      "targetProject": "../../samples/Harness/Harness.csproj"
+      "targetProject": "../../samples/SampleCheckout/SampleCheckout.csproj"
     }
   }
 }

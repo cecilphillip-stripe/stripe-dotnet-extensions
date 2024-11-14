@@ -7,31 +7,29 @@ using Microsoft.CodeAnalysis.Text;
 namespace Stripe.Extensions.AspNetCore.SourceGenerators;
 
 [Generator]
-public class StripeWebhookHandlerGenerator : ISourceGenerator
+public class StripeWebhookHandlerGenerator : IIncrementalGenerator
 {
-    public void Initialize(GeneratorInitializationContext context)
+    public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-    }
+        context.RegisterSourceOutput(context.CompilationProvider, (spc, compilation) =>
+        {
+            var handlerCode = GenerateEventHandlerCode();
 
-    public void Execute(GeneratorExecutionContext context)
-    {
-        var handlerCode = GenerateEventHandlerCode();
-
-        var generatedCode = SourceText.From($@"
+            var generatedCode = SourceText.From($@"
 using Stripe;
 
 namespace Stripe.Extensions.AspNetCore;
 
 public abstract partial class StripeWebhookHandler
 {{
-       
+ 
     // generated code
 {handlerCode}
-    
 }}
 ", Encoding.UTF8);
 
-        context.AddSource("Stripe.Extensions.AspNetCore.g.cs", generatedCode);
+            spc.AddSource("Stripe.Extensions.AspNetCore.g.cs", generatedCode);
+        });
     }
 
     private string GetEmbeddedResourceSpecJson()
