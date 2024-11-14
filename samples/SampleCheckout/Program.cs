@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddStripe(configureOptions: opts =>
     {
-        opts.SecretKey = opts.WebhookSecret = "ok_test_123";
+        opts.ApiKey = opts.WebhookSecret = "ok_test_123";
     })
     .AddStandardResilienceHandler();
 
