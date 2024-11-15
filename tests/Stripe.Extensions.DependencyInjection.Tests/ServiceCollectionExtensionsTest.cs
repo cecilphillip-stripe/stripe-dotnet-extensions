@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Stripe.Extensions.DependencyInjection.Tests;
@@ -7,62 +8,26 @@ namespace Stripe.Extensions.DependencyInjection.Tests;
 public class ServiceCollectionExtensionsTest
 {
     [Fact]
-    public void CanResolveStripeServicesFromStripeServiceProvider()
+    public void CanResolveStripeOptions()
     {
         var collection = new ServiceCollection();
 
         collection.AddSingleton<IConfiguration>(new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>()
             {
-                { "Stripe:SecretKey", "MyKey" }
+                ["Stripe:Default:ApiKey"] = "MyKey"
             }).Build());
 
         collection.AddStripe();
 
         var provider = collection.BuildServiceProvider();
-        var stripeServiceProvider = provider.GetRequiredService<IStripeServiceProvider>();
-        Assert.NotNull(stripeServiceProvider);
+        var opts = provider.GetService<IOptionsSnapshot<StripeOptions>>();
 
-        Assert.NotNull(stripeServiceProvider.GetService<ProductService>());
-        Assert.NotNull(stripeServiceProvider.GetService<AccountService>());
-        Assert.NotNull(stripeServiceProvider.GetService<CouponService>());
-    }
-    
-    [Fact]
-    public void CanResolveStripeServicesFromStripeServiceProviderWithNamedClient()
-    {
-        const string clientOneKey = "ClientOne";
-        const string otherStripe = "OtherStripe";
+        Assert.NotNull(opts);
+        var defaultOpts = opts.Get("Default");
 
-        var collection = new ServiceCollection();
-
-        collection.AddStripe(clientOneKey, options => options.SecretKey = clientOneKey);
-        collection.AddStripe(otherStripe,options => options.SecretKey = otherStripe);
-
-        var provider = collection.BuildServiceProvider();
-        var stripeServiceProvider = provider.GetRequiredService<IStripeServiceProvider>();
-        Assert.NotNull(stripeServiceProvider);
-
-        Assert.NotNull(stripeServiceProvider.GetService<ProductService>(clientOneKey));
-        Assert.NotNull(stripeServiceProvider.GetService<AccountService>(otherStripe));
-        Assert.Null(stripeServiceProvider.GetService<CouponService>());
-    }
-
-    [Fact]
-    public void CannotResolveNonStripeServicesFromStripeServiceProvider()
-    {
-        var collection = new ServiceCollection();
-
-        collection.AddStripe(configureOptions: opts => opts.SecretKey = "SecretKey");
-
-        var provider = collection.BuildServiceProvider();
-        var stripeServiceProvider = provider.GetRequiredService<IStripeServiceProvider>();
-
-        Assert.NotNull(stripeServiceProvider);
-
-        Assert.Null(stripeServiceProvider.GetService<StripeOptions>());
-        Assert.Null(stripeServiceProvider.GetService<Object>());
-        Assert.Null(stripeServiceProvider.GetService<Product>());
+        Assert.Equal("MyKey", defaultOpts.ApiKey);
+        Assert.Equal(defaultOpts.SecretKey, defaultOpts.ApiKey);
     }
 
     [Fact]
@@ -73,17 +38,17 @@ public class ServiceCollectionExtensionsTest
         collection.AddSingleton<IConfiguration>(new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>()
             {
-                { "Stripe:SecretKey", "MyKey" }
+                ["Stripe:Default:ApiKey"] = "MyKey"
             }).Build());
 
         collection.AddStripe();
 
         var provider = collection.BuildServiceProvider();
-        var stripedClient = provider.GetRequiredService<IStripeClient>();
+        var stripedClient = provider.GetRequiredService<StripeClient>();
         Assert.NotNull(stripedClient);
 
         var keyedStripeClient =
-            provider.GetKeyedService<IStripeClient>(StripeOptions.DefaultClientConfigurationSectionName);
+            provider.GetKeyedService<StripeClient>(StripeOptions.DefaultClientConfigurationSectionName);
         Assert.NotNull(keyedStripeClient);
 
         Assert.StrictEqual(stripedClient, keyedStripeClient);
@@ -100,9 +65,9 @@ public class ServiceCollectionExtensionsTest
         collection.AddSingleton<IConfiguration>(new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>()
             {
-                { "Stripe:SecretKey", "MyKey" },
-                { $"{clientOneKey}:SecretKey", clientOneKey },
-                { $"{otherStripe}:SecretKey", otherStripe }
+                ["Stripe:Default:ApiKey"] = "MyKey",
+                [$"Stripe:{clientOneKey}:ApiKey"] = clientOneKey,
+                [$"Stripe:{otherStripe}:ApiKey"] = otherStripe
             }).Build());
 
         collection.AddStripe("ClientOne");
@@ -110,10 +75,10 @@ public class ServiceCollectionExtensionsTest
 
         var provider = collection.BuildServiceProvider();
 
-        Assert.NotNull(provider.GetKeyedService<IStripeClient>(clientOneKey));
-        Assert.NotNull(provider.GetKeyedService<IStripeClient>(otherStripe));
+        Assert.NotNull(provider.GetKeyedService<StripeClient>(clientOneKey));
+        Assert.NotNull(provider.GetKeyedService<StripeClient>(otherStripe));
 
-        var stripedClient = provider.GetService<IStripeClient>();
+        var stripedClient = provider.GetService<StripeClient>();
         Assert.Null(stripedClient);
     }
 
@@ -124,21 +89,23 @@ public class ServiceCollectionExtensionsTest
         const string otherStripe = "OtherStripe";
 
         var collection = new ServiceCollection();
+        collection.AddSingleton<IConfiguration>(new ConfigurationBuilder()
+            .AddInMemoryCollection().Build());
 
-        collection.AddStripe(clientOneKey, options => options.SecretKey = clientOneKey);
-        collection.AddStripe(otherStripe, options => options.SecretKey = otherStripe);
+        collection.AddStripe(clientOneKey, options => options.ApiKey = clientOneKey);
+        collection.AddStripe(otherStripe, options => options.ApiKey = otherStripe);
 
         var provider = collection.BuildServiceProvider();
 
-        var clientOne = provider.GetKeyedService<IStripeClient>(clientOneKey);
+        var clientOne = provider.GetKeyedService<StripeClient>(clientOneKey);
         Assert.NotNull(clientOne);
         Assert.Equal(clientOneKey, clientOne.ApiKey);
 
-        var otherClient = provider.GetKeyedService<IStripeClient>(otherStripe);
+        var otherClient = provider.GetKeyedService<StripeClient>(otherStripe);
         Assert.NotNull(otherClient);
         Assert.Equal(otherStripe, otherClient.ApiKey);
     }
-    
+
     [Fact]
     public void UniqueConfigurationMerge()
     {
@@ -148,79 +115,30 @@ public class ServiceCollectionExtensionsTest
         collection.AddSingleton<IConfiguration>(new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>()
             {
-                { "Stripe:SecretKey", "MyKey" },
-                { $"{clientOneKey}:SecretKey", "one" }
+                { "Stripe:Default:SecretKey","MyKey" },
+                { $"Stripe:{clientOneKey}:SecretKey", "one" }
             }).Build());
-        
-        collection.AddStripe(clientOneKey, opts =>
-        {
-            opts.SecretKey = clientOneKey;
-        });
+
+        collection.AddStripe(clientOneKey, opts => { opts.ApiKey = clientOneKey; });
 
         var provider = collection.BuildServiceProvider();
 
-        var clientOne = provider.GetKeyedService<IStripeClient>(clientOneKey);
+        var clientOne = provider.GetKeyedService<StripeClient>(clientOneKey);
         Assert.NotNull(clientOne);
         Assert.Equal(clientOneKey, clientOne.ApiKey);
-        
-        var stripeServiceProvider = provider.GetRequiredService<IStripeServiceProvider>();
-        Assert.NotNull(stripeServiceProvider);
-        
-        var productService = stripeServiceProvider.GetService<ProductService>(clientOneKey);
-        Assert.NotNull(productService);
-        Assert.Equal(clientOneKey, productService.Client.ApiKey );
     }
 
     [Fact]
     public void ThrowsInvalidOperationExceptionIfSecretKeyIsNotProvided()
     {
         var collection = new ServiceCollection();
+        collection.AddSingleton<IConfiguration>(new ConfigurationBuilder()
+            .AddInMemoryCollection().Build());
         collection.AddStripe();
 
         var provider = collection.BuildServiceProvider();
-        var stripeServiceProvider = provider.GetRequiredService<IStripeServiceProvider>();
-        var exception = Assert.Throws<InvalidOperationException>(() => stripeServiceProvider.GetService<PriceService>());
-        Assert.StartsWith("SecretKey is required to make requests to Stripe API. ", exception.Message);
-    }
-
-    [Fact]
-    public void ReadsKeyInformationFromDefaultConfigSection()
-    {
-        var collection = new ServiceCollection();
-
-        collection.AddSingleton<IConfiguration>(new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>()
-            {
-                { "Stripe:SecretKey", "MyKey" }
-            }).Build());
-
-        collection.AddStripe();
-
-        var provider = collection.BuildServiceProvider();
-        var stripeServiceProvider = provider.GetRequiredService<IStripeServiceProvider>();
-
-        var priceService = stripeServiceProvider.GetService<PriceService>()!;
-        Assert.Equal("MyKey", priceService.Client.ApiKey);
-    }
-
-    [Fact]
-    public void UsesApiKeyProvidedDuringRegistration()
-    {
-        var collection = new ServiceCollection();
-
-        collection.AddSingleton<IConfiguration>(new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>()
-            {
-                { "Stripe:SecretKey", "MyKey" }
-            }).Build());
-
-        collection.AddStripe(configureOptions: opts => opts.SecretKey = "AnotherKey");
-
-        var provider = collection.BuildServiceProvider();
-        var stripeServiceProvider = provider.GetRequiredService<IStripeServiceProvider>();
-
-        var priceService = stripeServiceProvider.GetService<PriceService>()!;
-        Assert.Equal("AnotherKey", priceService.Client.ApiKey);
+        var exception = Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<StripeClient>());
+        Assert.StartsWith("ApiKey is required to make requests to Stripe API. ", exception.Message);
     }
 
     [Fact]
@@ -229,7 +147,7 @@ public class ServiceCollectionExtensionsTest
         ServiceCollection? collection = null;
         Assert.Throws<ArgumentNullException>(() => collection!.AddStripe());
     }
-    
+
     [Fact]
     public void AddStripeThrowsExceptionIfClientNameNull()
     {

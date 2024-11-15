@@ -51,18 +51,16 @@ public static class StripeServiceCollectionExtensions
 
     private static IStripeClientBuilder RegisterClientServices(this IServiceCollection services, string clientName)
     {
-        services.AddSingleton<IStripeServiceProvider, StripeServiceProvider>();
-        
         var httpClientBuilder = services.AddHttpClient(clientName);
         var stripeClientBuilder = new StripeClientBuilder(httpClientBuilder);
 
-        services.AddKeyedScoped<IStripeClient, StripeClient>(clientName,
+        services.AddKeyedScoped<StripeClient>(clientName,
             (serviceProvider, _) => stripeClientBuilder.Build(serviceProvider));
 
         if (clientName == DefaultClientConfigurationSectionName)
         {
-            services.AddScoped<IStripeClient>(serviceProvider =>
-                serviceProvider.GetRequiredKeyedService<IStripeClient>(clientName));
+            services.AddScoped<StripeClient>(serviceProvider =>
+                serviceProvider.GetRequiredKeyedService<StripeClient>(clientName));
         }
 
         return stripeClientBuilder;

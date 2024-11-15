@@ -31,7 +31,7 @@ public static class StripeAppBuilderExtensions
         endpointRouteBuilder.MapPost(pattern, async context =>
         {
             var handlerFactory = ActivatorUtilities.CreateFactory(typeof(T), [typeof(StripeWebhookContext)]);
-            var stripeClient = context.RequestServices.GetRequiredKeyedService<IStripeClient>(namedConfiguration);
+            var stripeClient = context.RequestServices.GetRequiredKeyedService<StripeClient>(namedConfiguration);
             var options = context.RequestServices.GetRequiredService<IOptionsSnapshot<StripeOptions>>()
                 .Get(namedConfiguration);
 

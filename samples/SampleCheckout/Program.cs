@@ -22,16 +22,18 @@ app.Run();
 
 public class MyWebhookHandler: StripeWebhookHandler
 {
-    private readonly CustomerService? _customerService;
-    public MyWebhookHandler(IStripeServiceProvider stripeServiceProvider, StripeWebhookContext context): base(context)
+    private readonly StripeClient _stripeClient;
+    public MyWebhookHandler(IServiceProvider stripeServiceProvider, StripeWebhookContext context): base(context)
     {
-        _customerService = stripeServiceProvider.GetService<CustomerService>(Context.StripeOptions.ClientName);
+        Logger = stripeServiceProvider.GetRequiredService<ILogger<MyWebhookHandler>>();
+        _stripeClient = stripeServiceProvider.GetRequiredService<StripeClient>();
+        //_stripeClient = stripeServiceProvider.GetKeyedService<StripeClient>(Context.StripeOptions.ClientName);
     }
 
     public override async Task OnCustomerCreatedAsync(Event e)
     {
         var customer = (e.Data.Object as Customer)!;
-        await _customerService!.UpdateAsync(customer.Id, new CustomerUpdateOptions()
+        await _stripeClient.V1.Customers.UpdateAsync(customer.Id, new CustomerUpdateOptions()
         {
             Description = "New customer"
         });

@@ -19,10 +19,10 @@ internal sealed class StripeClientBuilder(IHttpClientBuilder httpClientBuilder) 
         
         var stripeOptions = scope.ServiceProvider.GetRequiredService<IOptionsSnapshot<StripeOptions>>().Get(Name);
         
-        if (string.IsNullOrEmpty(stripeOptions.SecretKey))
+        if (string.IsNullOrEmpty(stripeOptions.ApiKey))
         {
-            throw new InvalidOperationException("SecretKey is required to make requests to Stripe API. " +
-                                                "You can set it using Stripe:SecretKey configuration section or " +
+            throw new InvalidOperationException("ApiKey is required to make requests to Stripe API. " +
+                                                "You can set it using Stripe:<Section>:ApiKey configuration section or " +
                                                 "by passing the value to .AddStripe(\"key\") call");
         }
 
