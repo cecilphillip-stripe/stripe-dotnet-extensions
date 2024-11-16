@@ -14,7 +14,6 @@ public class StripeWebhookHandlerGeneratorTests
 
         var compilation = CSharpCompilation.Create(nameof(StripeWebhookHandlerGeneratorTests));
         driver.RunGeneratorsAndUpdateCompilation(compilation, out var newCompilation, out var diagnostics);
-
         
         // Retrieve all files in the compilation.
         var generatedFiles = newCompilation.SyntaxTrees
