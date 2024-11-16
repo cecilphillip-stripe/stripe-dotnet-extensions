@@ -122,7 +122,8 @@ public class WebhookHandlerTests
         
         using var httpClient = app.GetTestClient();
         var response = await httpClient.PostAsync("/stripe/webhook", BuildPayload("customer.happy"));
-        Assert.Equal((HttpStatusCode)200, response.StatusCode);
+        
+        Assert.True(response.IsSuccessStatusCode);
         A.CallTo(logger).Where(l => l.Method.Name == "Log"
                                 && l.GetArgument<LogLevel>(0) == LogLevel.Warning
                                 && l.GetArgument<EventId>(1).Id == 3).MustHaveHappened();
@@ -144,7 +145,7 @@ public class WebhookHandlerTests
         
         using var httpClient = app.GetTestClient();
         var response = await httpClient.PostAsync("/stripe/webhook", BuildPayload("customer.updated"));
-        Assert.Equal((HttpStatusCode)500, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
         A.CallTo(logger).Where(l => l.Method.Name == "Log"
                                     && l.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -183,7 +184,7 @@ public class WebhookHandlerTests
         using var httpClient = app.GetTestClient();
         var response = await httpClient.PostAsync("/stripe/webhook", BuildPayload(apiVersion: "01-02-1234"));
 
-        Assert.Equal((HttpStatusCode)200, response.StatusCode);
+        Assert.True(response.IsSuccessStatusCode);
         Assert.Contains(_invocations, e => e.Type == "customer.created");
     }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -27,8 +28,8 @@ public static class StripeAppBuilderExtensions
 
         if (namedConfiguration == null)
             throw new ArgumentNullException(nameof(namedConfiguration));
-   
-        endpointRouteBuilder.MapPost(pattern, async context =>
+
+        endpointRouteBuilder.MapPost(pattern, async (HttpContext context) =>
         {
             var handlerFactory = ActivatorUtilities.CreateFactory(typeof(T), [typeof(StripeWebhookContext)]);
             var stripeClient = context.RequestServices.GetRequiredKeyedService<StripeClient>(namedConfiguration);
@@ -37,7 +38,8 @@ public static class StripeAppBuilderExtensions
 
             var stripeWebhookContext = new StripeWebhookContext(context, options, stripeClient);
             var handler = (T)handlerFactory(context.RequestServices, [stripeWebhookContext]);
-            await handler.ExecuteAsync();
+            var result = await handler.ExecuteAsync();
+            return result;
         });
 
         return endpointRouteBuilder;
