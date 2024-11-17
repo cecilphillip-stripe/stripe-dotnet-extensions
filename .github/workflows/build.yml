@@ -52,10 +52,10 @@ jobs:
         dotnet-quality: 'ga'
 
     - name: Build
-      run: ./build compile
+      run: ./build compile --Configuration Release
 
   package:
-    name: create-nuget-packages
+    name: Create NuGet Packages
     runs-on: 'ubuntu-latest'
     needs: [build]
 
@@ -70,7 +70,7 @@ jobs:
         dotnet-quality: 'ga'
 
     - name: Create Packages
-      run: ./build pack
+      run: ./build pack --Configuration Release
 
     - name: Upload packages to artifacts
       uses: actions/upload-artifact@v4
@@ -95,13 +95,20 @@ jobs:
       with:
         dotnet-version: '9.0.x'
         dotnet-quality: 'ga'
+    
+    - name: Download packages
+      uses: actions/download-artifact@v4
+      with:
+        name: packages
+        path: ./artifacts/packages
 
     - name: Publish packages to GitHub
       if: github.event.inputs.packregistry == 'GitHub'
       run: |
-        ./build publish --NuGetSource https://nuget.pkg.github.com/cecilphillip-stripe/index.json --NuGetApiKey ${{ secrets.NUGET_GITHUB_TOKEN }}
+        dotnet nuget push ./artifacts/packages/*.nupkg --source https://nuget.pkg.github.com/cecilphillip-stripe/index.json --api-key ${{ secrets.NUGET_GITHUB_TOKEN }}        
 
     - name: Publish packages to NuGet
       if: github.event.inputs.packregistry == 'NuGet'
       run: |
-        ./build publish --NuGetSource https://api.nuget.org/v3/index.json --NuGetApiKey ${{ secrets.NUGET_API_KEY }}
+        dotnet nuget push ./artifacts/packages/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
+        
