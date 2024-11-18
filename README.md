@@ -2,6 +2,8 @@
 
 ![logo](https://cdn.brandfolder.io/KGT2DTA4/at/bskj2q8srfqx3cvfqvhk73pc/Stripe_wordmark_-_blurple_small.png?width=437&height=208)
 
+![](https://github.com/cecilphillip-stripe/stripe-dotnet-extensions/actions/workflows/build.yml/badge.svg)
+
 The Stripe .NET Extension packages provide a collection of convenient features 
 to help improve the experience integrating Stripe in .NET applications. 
 

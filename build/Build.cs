@@ -43,6 +43,7 @@ class Build : NukeBuild, IPublish
             Log.Information("Solution directory = {Dir}", solution.Directory);
             Log.Information("Source Repository = {GitUrl} / [{GitBranch}]", GitRepo.HttpsUrl, GitRepo.Branch);
             Log.Information("Project Version {Version}", MinVerInfo.Version);
+            Log.Information("Git Repository {GitRepoUrl}", GitRepo.HttpsUrl);
         });
 
     Target CleanSamples => target => target
@@ -92,6 +93,7 @@ class Build : NukeBuild, IPublish
         var version = MinVerTasks.MinVer(settings => settings
                 .SetTagPrefix(MinVerTagPrefix)
                 .SetMinimumMajorMinor(MinVerMinimumMajorMinor)
+                .SetVerbosity(MinVerVerbosity.Info)
                 .SetProcessEnvironmentVariable("MinVerDefaultPreReleaseIdentifiers", MinVerPreReleaseIdentifiers)
                 .DisableProcessLogOutput())
             .Result;
