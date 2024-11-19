@@ -18,9 +18,9 @@ dotnet add package Stripe.Extensions.DependencyInjection
 dotnet add package Stripe.Extensions.AspNetCore
 ```
 
-## Usage
+## DependencyInjection registration
 
-Use the `AddStripe()` extension method to register Stripe services in Dependency Injection container:
+Using `Stripe.Extensions.DependencyInjection` you can register named and unnamed versions of `StripeClient` using `AddStripe()`.
 
 ```csharp
 // Startup-based apps
@@ -43,70 +43,69 @@ builder.Services.AddStripe("client2"); // client2
 
 ### Configuration
 
-The Stripe [API keys](https://docs.stripe.com/keys#obtain-api-keys) need to be configured before calls can be made using the SDK.
+The Stripe [API keys](https://docs.stripe.com/keys#obtain-api-keys) need to be configured in your application before calls can be made using the SDK.
 By default, the extension packages will look for a `Stripe` configuration section when calling `AddStripe()` 
 without a client name. For named clients, the configuration section should match the client name.
 
 To configure the default client: 
 ```json
 {
-  "Stripe": {
-    "SecretKey" : "<secret key>",
-    "WebhookSecret": "<webhook secret>"
-  }
+  "Stripe": { 
+    "Default" : {
+      "ApiKey": "<secret key>",
+      "WebhookSecret": "<webhook secret>"
+    }
+  } 
 }
 ```
+
 To configure a client named `client1`:
 ```json
 {
-  "client1": {
-    "SecretKey" : "<secret key>",
-    "WebhookSecret": "<webhook secret>"
+  "Stripe": {
+    "client1": {
+      "ApiKey": "<secret key>",
+      "WebhookSecret": "<webhook secret>"
+    }
   }
 }
 ```
 
-Configuration can also be attached to each registered client by using the `WithOptions` method.
-It can accept an instance of `StripeOptions` or a configuration delegate.
+Configuration can also be attached to each registered client passing in a configuration delegate method.
 
 ```csharp
-// using StripeOptions
-builder.Services.AddStripe()
-    .WithOptions(new StripeOptions {
-        SecretKey = "<secret key>",
-        WebhookSecret = "<webhook secret>"
-    });
+// default registration 
+builder.Services.AddStripe(configureOptions: opts =>
+{
+    opts.ApiKey = "<secret key>";
+    opts.WebhookSecret = "<webhook secret>";
+});
 
-// using configuration delegate
-builder.Services.AddStripe("client1")
-    .WithOptions( options => { 
-        options.SecretKey = "<secret key>";
-        options.WebhookSecret = "<webhook secret>";
-    });
+// name registration 
+builder.Services.AddStripe("client1", opts =>
+{
+    opts.ApiKey = "<secret key>";
+    opts.WebhookSecret = "<webhook secret>";
+});
 ```
-> If both configuration options are used, `WithOptions` will take precedence and override the values
-provided in the configuration section.
 
-### Registering services
-`AddStripe` registers the following services in the DI container:
-- `IStripeClient` - the main Stripe client used to make API calls.
-- `IStripeServiceProvider` - a service provider that can be used to resolve Stripe services.
+> See [StripeOptions](src/Stripe.Extensions.DependencyInjection/StripeOptions.cs) for all the available options.
 
 Retrieving the default client registered with `AddStripe()`: 
+
 ```csharp
 public class HomeController : Controller
 {
-    private readonly IStripeClient _stripeClient;
+    private readonly StripeClient _stripeClient;
 
-    public HomeController(IStripeClient stripeClient)
+    public HomeController(StripeClient stripeClient)
     {
         _stripeClient = stripeClient;
     }
     
     public async Task<IActionResult> Index()
-    {
-        var customerService = new CustomerService(_stripeClient);
-        var customer = await customerService.GetAsync("cus_NffrFeUfNV2Hib");        
+    {        
+        var customer = await _stripeClient.V1.Customers.GetAsync("cus_NffrFeUfNV2Hib");        
         ...
         return View();
     } 
@@ -114,6 +113,7 @@ public class HomeController : Controller
 ```
 
 Retrieving a client registered with `AddStripe("client1")`:
+
 ```csharp
 public class HomeController : Controller
 {
@@ -126,42 +126,12 @@ public class HomeController : Controller
 }
 ```
 
-The `IStripeServiceProvider` service is provided as a convenience helper to resolve Stripe named services. 
-```csharp
-public class HomeController : Controller
-{
-    private readonly IStripeServiceProvider _stripeServiceProvider;
-
-    public HomeController(IStripeServiceProvider stripeServiceProvider)
-    {
-        _stripeServiceProvider = stripeServiceProvider;
-    }
-    
-    public async Task<IActionResult> Index()
-    {
-        // default client
-        var customerService = _stripeServiceProvider.GetService<CustomerService>();
-        
-        // named client
-        var nameCustomerService = _stripeServiceProvider.GetService<CustomerService>("client1"); 
-        ...
-        return View();
-    } 
-}
-```
-
 ### Webhook handling
 
-The Stripe.Extensions.AspNetCore package simplifies Webhook handling by automating the event parsing, signature validation and logging.
+The `Stripe.Extensions.AspNetCore` package simplifies Webhook handling by automating the event parsing, signature validation and logging.
 All that's needed is to override the appropriate events of the handler class.
 
-First, define a handler class that inherits from [StripeWebhookHandler](./src/Stripe.Extensions.AspNetCore/StripeWebhookHandler.cs):
-
-```csharp
-public class MyWebhookHandler: StripeWebhookHandler {}
-```
-
-The `StripeWebhookHandler` class defines virtual methods for all known webhook events.
+Create a handler class that inherits from [StripeWebhookHandler](./src/Stripe.Extensions.AspNetCore/StripeWebhookHandler.cs), which defines virtual methods for all known webhook events.
 To handle an event override the corresponding `On*Async` method.
 
 ```csharp
@@ -176,13 +146,11 @@ public class MyWebhookHandler: StripeWebhookHandler
 ```
 
 The last step is to register the webhook handler with ASP.NET Core routing by calling `MapStripeWebhookHandler`.
-> NOTE: the Stripe Webhook handler uses ASP.NET Core routing, so adding a call to `app.UseRouting()` might be required.
 
 ```csharp
 // Startup-based apps
 public void Configure(IApplicationBuilder app)
 {
-    app.UseRouting();
     app.UseEndpoints(b => b.MapStripeWebhookHandler<MyWebhookHandler>());
 }
 
@@ -197,16 +165,16 @@ The `StripeWebhookHandler` also supports constructor dependency injection, so St
 ```csharp
 public class MyWebhookHandler: StripeWebhookHandler
 {
-    private readonly CustomerService _customerService;
-    public MyWebhookHandler(CustomerService customerService)
+    private readonly StripeClient _stripeClient;
+    public MyWebhookHandler(StripeClient stripeClient)
     {
-        _customerService = customerService;
+        _stripeClient = stripeClient;
     }
 
     public override async Task OnCustomerCreatedAsync(Event e)
     {
         Customer customer = (Customer)e.Data.Object;
-        await _customerService.UpdateAsync(customer.Id, new CustomerUpdateOptions()
+        await _stripeClient.V1.Customers.UpdateAsync(customer.Id, new CustomerUpdateOptions()
         {
             Description = "New customer"
         });

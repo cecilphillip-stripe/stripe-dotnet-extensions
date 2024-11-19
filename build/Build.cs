@@ -93,6 +93,7 @@ class Build : NukeBuild, IPublish
         var version = MinVerTasks.MinVer(settings => settings
                 .SetTagPrefix(MinVerTagPrefix)
                 .SetMinimumMajorMinor(MinVerMinimumMajorMinor)
+                .SetAutoIncrement(MinVerVersionPart.Patch)
                 .SetVerbosity(MinVerVerbosity.Info)
                 .SetProcessEnvironmentVariable("MinVerDefaultPreReleaseIdentifiers", MinVerPreReleaseIdentifiers)
                 .DisableProcessLogOutput())
