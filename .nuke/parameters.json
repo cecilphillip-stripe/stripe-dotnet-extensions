@@ -2,6 +2,6 @@
   "$schema": "./build.schema.json",
   "Solution": "Stripe.Extensions.sln",
   "MinVerTagPrefix": "v",
-  "MinVerPreReleaseIdentifiers": "preview.0",
-  "MinVerMinimumMajorMinor": "0.1"
+  "MinVerPreReleaseIdentifiers": "preview.1",
+  "MinVerIgnoreHeight": "true"
 }

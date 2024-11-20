@@ -26,7 +26,7 @@ class Build : NukeBuild, IPublish
 
     [Parameter] readonly string MinVerTagPrefix;
     [Parameter] readonly string MinVerPreReleaseIdentifiers;
-    [Parameter] readonly string MinVerMinimumMajorMinor;
+    [Parameter] readonly string MinVerIgnoreHeight;
 
     AbsolutePath SourceDirectory => RootDirectory / "src";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
@@ -92,11 +92,12 @@ class Build : NukeBuild, IPublish
         base.OnBuildInitialized();
         var version = MinVerTasks.MinVer(settings => settings
                 .SetTagPrefix(MinVerTagPrefix)
-                .SetMinimumMajorMinor(MinVerMinimumMajorMinor)
                 .SetAutoIncrement(MinVerVersionPart.Patch)
                 .SetVerbosity(MinVerVerbosity.Info)
                 .SetProcessEnvironmentVariable("MinVerDefaultPreReleaseIdentifiers", MinVerPreReleaseIdentifiers)
-                .DisableProcessLogOutput())
+                .SetProcessEnvironmentVariable("MinVerIgnoreHeight", MinVerIgnoreHeight )
+                .DisableProcessLogOutput()
+            )
             .Result;
 
         MinVerInfo = version;
